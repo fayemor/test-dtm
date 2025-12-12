@@ -84,7 +84,8 @@
                     class="fa-solid fa-xmark text-xl"></i></button>
             <div
                 class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 text-red-500 shadow-sm">
-                <i class="fa-solid fa-trash-can text-2xl"></i></div>
+                <i class="fa-solid fa-trash-can text-2xl"></i>
+            </div>
             <h3 class="text-xl font-bold text-gray-800 mb-2">Êtes-vous sûr ?</h3>
             <p id="confirmMessage" class="text-gray-500 text-sm mb-8 leading-relaxed">Cette action est irréversible.</p>
             <div class="flex justify-center gap-3">
@@ -307,15 +308,38 @@
         document.getElementById('confirmBtnAction').onclick = () => closeConfirm(true);
 
 
-        // --- NOUVELLE FONCTION: VALIDER PAIEMENT ---
+        // --- LOGIQUE D'EXPIRATION ET DE VALIDATION DE PAIEMENT (CORRIGÉE POUR LE 30 AOÛT) ---
+
+        // 1. Fonction pour valider/réactiver la cotisation
         async function validatePayment(id) {
-            const confirmed = await showConfirmModal("Marquer la cotisation comme payée ?");
+            const confirmed = await showConfirmModal("Marquer la cotisation comme payée ? (Expiration le 30 août de l'année prochaine)");
             if (confirmed) {
                 try {
                     const userRef = doc(db, "membres", id);
-                    await updateDoc(userRef, {cotisation_payee: true});
+
+                    // Calcul de la date d'expiration (30 août de l'année suivante)
+                    const now = new Date();
+                    const currentYear = now.getFullYear();
+
+                    // L'expiration est le 30 août de l'année la plus proche.
+                    let targetYear = currentYear;
+
+                    // Si nous sommes APRÈS le 30 août de cette année (mois > 7), l'expiration est l'année prochaine.
+                    if (now.getMonth() > 7 || (now.getMonth() === 7 && now.getDate() > 30)) {
+                        targetYear += 1;
+                    }
+
+                    // La date d d'expiration est le 30 août de l'année cible.
+                    const expirationDate = new Date(targetYear, 7, 30); // 7 est Août (0-indexé)
+
+                    // Mise à jour de la DB : ajoute la date d'expiration au format ISO string
+                    await updateDoc(userRef, {
+                        cotisationPayee: true,
+                        cotisationExpiration: expirationDate.toISOString() // Date au format standard international
+                    });
+
                     loadMembers(); // Recharger pour mettre à jour le tableau
-                    showNotification('success', "Paiement validé !");
+                    showNotification('success', `Cotisation validée ! Expiration: ${expirationDate.toLocaleDateString()}`);
                 } catch (e) {
                     showNotification('warning', "Erreur validation: " + e.message);
                 }
@@ -330,18 +354,39 @@
                 document.getElementById('count').innerText = snap.size;
                 tbody.innerHTML = '';
                 allUsersData = [];
+
+                const today = new Date();
+
                 snap.forEach(docSnap => {
                     const u = docSnap.data();
                     u.firebaseId = docSnap.id;
                     allUsersData.push(u);
 
-                    const isPaid = u.cotisation_payee === true;
-                    const statusText = isPaid ? 'Payée' : 'En attente';
-                    const statusClass = isPaid ? 'bg-green-100 text-green-700' : 'bg-red-custom text-red-700';
+                    let isPaid = u.cotisationPayee === true;
+                    let statusText = 'En attente';
+                    let statusClass = 'bg-red-custom text-red-700';
+                    let needsValidation = true;
 
-                    const validateButton = isPaid
-                        ? `<button class="text-gray-400 p-1.5 rounded" disabled title="Déjà payé"><i class="fa-solid fa-check"></i></button>`
-                        : `<button onclick="validatePayment('${docSnap.id}')" class="text-green-500 hover:bg-green-50 p-1.5 rounded" title="Valider paiement"><i class="fa-solid fa-hand-holding-dollar"></i></button>`;
+                    if (isPaid && u.cotisationExpiration) {
+                        // Lire la date d'expiration de la DB
+                        const expirationDate = new Date(u.cotisationExpiration);
+
+                        if (today <= expirationDate) {
+                            // Payé ET Non expiré
+                            statusText = `Payée (Fin: ${expirationDate.toLocaleDateString()})`;
+                            statusClass = 'bg-green-100 text-green-700';
+                            needsValidation = false;
+                        } else {
+                            // Payé MAIS Expiré
+                            statusText = `Expirée (Fin: ${expirationDate.toLocaleDateString()})`;
+                            statusClass = 'bg-yellow-100 text-orange-700';
+                            needsValidation = true; // L'admin doit repayer/réactiver
+                        }
+                    }
+
+                    const validateButton = !needsValidation
+                        ? `<button class="text-gray-400 p-1.5 rounded" disabled title="Déjà valide"><i class="fa-solid fa-check"></i></button>`
+                        : `<button onclick="validatePayment('${docSnap.id}')" class="text-green-500 hover:bg-green-50 p-1.5 rounded" title="Valider paiement/Réactiver"><i class="fa-solid fa-hand-holding-dollar"></i></button>`;
 
                     tbody.innerHTML += `
                         <tr class="hover:bg-gray-50 border-b">
@@ -391,7 +436,17 @@
             if (typeof XLSX === 'undefined') {showNotification('warning', "Librairie non chargée."); return;}
             if (allUsersData.length === 0) {showNotification('warning', "Aucune donnée."); return;}
             let data = [];
-            allUsersData.forEach(u => {data.push({ID: u.id, Prénom: u.prenom, Nom: u.nom, Sexe: u.sexe || '', Date_Naissance: u.date_naissance || '', Lieu: u.lieu_naissance || '', Email: u.email, Tel: u.telephone, Cotisation: u.cotisation_payee ? 'Payée' : 'Non Payée', Adresse: u.adresse || '', Ville: u.ville || '', Statut_Dahira: u.statut_dahira || '', Statut_Pro: u.statut_pro || '', Université: u.universite || '', Spécialité: u.specialite, Niveau: u.niveau, Année: u.annee_etude || '', Compétences: u.competences ? u.competences.join(', ') : '', Commission: u.poste});});
+            allUsersData.forEach(u => {
+                const expiration = u.cotisationExpiration ? new Date(u.cotisationExpiration).toLocaleDateString() : 'N/A';
+                const status = u.cotisationExpiration && new Date(u.cotisationExpiration) > new Date() ? 'Payée' : 'Expirée/Non Payée';
+
+                data.push({
+                    ID: u.id, Prénom: u.prenom, Nom: u.nom, Email: u.email, Tel: u.telephone,
+                    Statut_Cotisation: status,
+                    Date_Expiration: expiration,
+                    Sexe: u.sexe || '', Date_Naissance: u.date_naissance || '', Lieu: u.lieu_naissance || '', Adresse: u.adresse || '', Ville: u.ville || '', Statut_Dahira: u.statut_dahira || '', Statut_Pro: u.statut_pro || '', Université: u.universite || '', Spécialité: u.specialite, Niveau: u.niveau, Année: u.annee_etude || '', Compétences: u.competences ? u.competences.join(', ') : '', Commission: u.poste
+                });
+            });
             const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Membres"); XLSX.writeFile(wb, "Base_DTM.xlsx");
             showNotification('success', "Export terminé !");
         }
