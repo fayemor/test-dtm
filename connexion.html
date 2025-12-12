@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - DTM</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dtm: {
+                            light: '#e0f2fe',
+                            primary: '#0284c7',
+                            dark: '#0c4a6e'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        body {
+            background-image: url('https://images.unsplash.com/photo-1638202993928-7267aad84c31?q=80&w=1920');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+
+        .glass-overlay {
+            background-color: rgba(255, 255, 255, 0.92);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Styles Champs */
+        .input-std {
+            @apply w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-dtm-primary focus:ring-2 focus:ring-dtm-light outline-none transition-all text-gray-800 placeholder-gray-400 font-medium;
+        }
+        .label-std {
+            @apply text-xs font-bold text-gray-500 uppercase ml-1 mb-1.5 block tracking-wide;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="notificationWrapper"
+        class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] pointer-events-none select-none">
+        <div id="successPopup"
+            class="bg-green-600/95 backdrop-blur-md text-white pl-4 pr-8 py-3 rounded-full shadow-2xl flex items-center space-x-4 transition-all duration-500 ease-out transform -translate-y-[250%] opacity-0 border border-green-500/50">
+            <div class="bg-white/20 rounded-full h-10 w-10 flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-check text-xl font-bold"></i>
+            </div>
+            <div>
+                <h4 class="font-bold text-base leading-none mb-1">Succès !</h4>
+                <p id="successText" class="text-sm text-green-100 leading-none">Connexion réussie.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-overlay p-4">
+        <div
+            class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-10 border border-white/50 fade-in relative backdrop-blur-sm">
+
+            <a href="index.html"
+                class="absolute top-8 left-8 text-gray-400 hover:text-dtm-primary transition-colors duration-200">
+                <i class="fa-solid fa-arrow-left text-xl"></i>
+            </a>
+
+            <div class="text-center mb-10">
+                <img src="logo.png" class="h-32 mx-auto mb-6 transition-transform hover:scale-105"
+                    onerror="this.src='https://cdn-icons-png.flaticon.com/512/1034/1034179.png'">
+                <h2 class="text-3xl font-bold text-dtm-dark tracking-tight">Bon retour !</h2>
+                <p class="text-gray-500 mt-2 text-sm font-medium">Connectez-vous à votre espace membre</p>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-6">
+                <div>
+                    <label class="label-std">Email</label>
+                    <input type="email" id="loginEmail" required class="input-std" placeholder="votre@email.com">
+                </div>
+                <div>
+                    <div class="flex justify-between">
+                        <label class="label-std">Mot de passe</label>
+                    </div>
+                    <input type="password" id="loginPassword" required class="input-std" placeholder="••••••••">
+                </div>
+
+                <div id="errorMessage"
+                    class="hidden p-3 bg-red-50 border border-red-100 text-red-600 rounded-lg text-sm text-center font-medium">
+                </div>
+
+                <button type="submit" id="loginBtn"
+                    class="w-full bg-dtm-primary hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.01] text-lg tracking-wide uppercase mt-4">
+                    Se connecter
+                </button>
+            </form>
+
+            <p class="mt-8 text-center text-sm text-gray-600">
+                Pas encore membre ?
+                <a href="inscription.html" class="text-dtm-primary font-bold hover:underline ml-1">Créer un compte</a>
+            </p>
+        </div>
+    </div>
+
+    <script type="module">
+        import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {getFirestore, collection, query, where, getDocs} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // VOS CLES API (DTM OFFICIEL)
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9O7wvG2s-teRO5IehT5K1ozJ48S2nDDo",
+            authDomain: "dtm-ugb-officiel.firebaseapp.com",
+            projectId: "dtm-ugb-officiel",
+            storageBucket: "dtm-ugb-officiel.firebasestorage.app",
+            messagingSenderId: "871436265978",
+            appId: "1:871436265978:web:98bf9fb593bd6e46e3dc43",
+            measurementId: "G-1P30LZJHYJ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- NOTIFICATION ---
+        function showSuccessNotification(message) {
+            const popup = document.getElementById('successPopup');
+            document.getElementById('successText').innerText = message;
+            popup.classList.remove('-translate-y-[250%]', 'opacity-0');
+            popup.classList.add('translate-y-0', 'opacity-100', 'scale-105');
+            setTimeout(() => {popup.classList.remove('scale-105');}, 200);
+        }
+
+        window.handleLogin = async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('errorMessage');
+
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Connexion...';
+            btn.disabled = true;
+            errorDiv.classList.add('hidden');
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const q = query(collection(db, "membres"), where("email", "==", email));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {throw new Error("Aucun compte trouvé avec cet email.");}
+
+                let userFound = null;
+
+                querySnapshot.forEach((doc) => {
+                    const userData = doc.data();
+                    if (userData.password === password) {
+                        // =======================================================
+                        // C'EST ICI LA MODIFICATION IMPORTANTE
+                        // On ajoute l'ID du document Firebase (doc.id) aux données
+                        // =======================================================
+                        userFound = {...userData, firebaseUid: doc.id};
+                    }
+                });
+
+                if (userFound) {
+                    localStorage.setItem('dtm_currentUser', JSON.stringify(userFound));
+
+                    showSuccessNotification("Connexion réussie ! Redirection...");
+
+                    setTimeout(() => {
+                        window.location.href = "dashboard.html";
+                    }, 1500);
+
+                } else {
+                    throw new Error("Mot de passe incorrect.");
+                }
+
+            } catch (error) {
+                console.error(error);
+                errorDiv.innerText = error.message;
+                errorDiv.classList.remove('hidden');
+                btn.innerHTML = 'Se connecter';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>

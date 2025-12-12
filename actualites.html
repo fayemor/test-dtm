@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualités - DTM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script> tailwind.config = {theme: {extend: {colors: {dtm: {light: '#e0f2fe', primary: '#0284c7', dark: '#0c4a6e'}}}}} </script>
+    <style>
+        /* NOUVEAU FOND BLEU (Dégradé DTM) */
+        body {
+            background: linear-gradient(135deg, #0284c7 0%, #0c4a6e 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        /* L'effet de verre est légèrement ajusté pour bien ressortir sur le bleu */
+        .glass-overlay {
+            background-color: rgba(255, 255, 255, 0.92);
+            min-height: 100vh;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        /* Animation pour l'article partagé */
+        @keyframes highlightPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.7);
+                border-color: #0284c7;
+                transform: scale(1.02);
+            }
+
+            70% {
+                box-shadow: 0 0 0 20px rgba(2, 132, 199, 0);
+                border-color: #0284c7;
+                transform: scale(1.02);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(2, 132, 199, 0);
+                transform: scale(1);
+            }
+        }
+
+        .highlight-news {
+            animation: highlightPulse 2s ease-out;
+            border: 2px solid #0284c7 !important;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+    <style>
+        body {
+            /* Le nouveau fond bleu */
+            background: linear-gradient(135deg, #0284c7 0%, #0c4a6e 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .glass-overlay {
+            background-color: rgba(255, 255, 255, 0.92);
+            /* Garde le contenu lisible */
+            min-height: 100vh;
+        }
+
+        /* ... le reste de vos animations ... */
+    </style>
+</head>
+
+<body>
+    <div class="glass-overlay">
+        <nav class="fixed w-full z-50 top-0 start-0 bg-white/95 backdrop-blur-md border-b shadow-sm">
+            <div class="max-w-screen-xl flex items-center justify-between mx-auto px-4 py-2">
+                <a href="index.html" class="flex items-center space-x-3 group">
+                    <img src="logo.png" class="h-16 w-auto transition-transform group-hover:scale-105" alt="DTM Logo"
+                        onerror="this.src='https://cdn-icons-png.flaticon.com/512/1034/1034179.png'">
+                    <span class="self-center text-xl font-bold text-dtm-dark hidden sm:block">DTM UGB</span>
+                </a>
+                <a href="index.html" class="text-dtm-primary font-bold hover:underline">Retour</a>
+            </div>
+        </nav>
+
+        <div class="pt-32 pb-12 px-4 max-w-screen-xl mx-auto fade-in">
+            <h2 class="text-4xl font-bold text-dtm-dark mb-10 text-center border-b pb-4 drop-shadow-sm">Fil d'actualités
+            </h2>
+
+            <div id="newsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="col-span-full text-center py-20 text-gray-500">
+                    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-dtm-primary mb-4"></i><br>Chargement...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="readModal" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity" onclick="closeReadModal()"></div>
+
+        <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+            <div
+                class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col pointer-events-auto transform transition-all scale-100">
+
+                <div class="relative h-64 bg-gray-100 flex-shrink-0">
+                    <img id="modalImg" src="" class="w-full h-full object-cover">
+                    <button onclick="closeReadModal()"
+                        class="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 w-10 h-10 flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                    <span id="modalCat"
+                        class="absolute bottom-4 left-4 bg-dtm-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow">Catégorie</span>
+                </div>
+
+                <div class="p-8 overflow-y-auto custom-scrollbar">
+                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                        <i class="fa-regular fa-calendar mr-2"></i> <span id="modalDate">Date</span>
+                    </div>
+
+                    <h2 id="modalTitle" class="text-2xl font-bold text-gray-900 mb-6 leading-tight">Titre de l'article
+                    </h2>
+
+                    <div id="modalDesc"
+                        class="text-gray-700 leading-relaxed space-y-4 text-justify text-lg whitespace-pre-wrap"></div>
+                </div>
+
+                <div class="bg-gray-50 px-6 py-4 border-t flex justify-end">
+                    <button type="button" onclick="closeReadModal()"
+                        class="bg-dtm-primary hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow transition-colors">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {getFirestore, collection, getDocs, query} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // CONFIG FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9O7wvG2s-teRO5IehT5K1ozJ48S2nDDo",
+            authDomain: "dtm-ugb-officiel.firebaseapp.com",
+            projectId: "dtm-ugb-officiel",
+            storageBucket: "dtm-ugb-officiel.firebasestorage.app",
+            messagingSenderId: "871436265978",
+            appId: "1:871436265978:web:98bf9fb593bd6e46e3dc43",
+            measurementId: "G-1P30LZJHYJ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Variable globale pour stocker les articles (pour la modale)
+        let allNewsData = [];
+
+        // Rendre les fonctions accessibles au HTML
+        window.openReadModal = openReadModal;
+        window.closeReadModal = closeReadModal;
+
+        async function loadNews() {
+            const container = document.getElementById('newsContainer');
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetId = urlParams.get('id');
+
+            try {
+                const q = query(collection(db, "actualites"));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    container.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Aucune actualité.</div>`;
+                    return;
+                }
+
+                container.innerHTML = '';
+                allNewsData = []; // Reset
+
+                querySnapshot.forEach((doc) => {
+                    const item = doc.data();
+                    const docId = doc.id;
+                    const imgUrl = item.image || 'https://placehold.co/600x400?text=Image+Manquante';
+
+                    // On sauvegarde les données pour la modale
+                    allNewsData.push({id: docId, ...item, image: imgUrl});
+
+                    // Highlight si partage
+                    const isTarget = (docId === targetId);
+                    const highlightClass = isTarget ? 'highlight-news ring-4 ring-blue-100' : '';
+
+                    container.innerHTML += `
+                        <div id="${docId}" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 group flex flex-col h-full ${highlightClass}">
+                            <div class="h-56 overflow-hidden relative bg-gray-100 cursor-pointer" onclick="openReadModal('${docId}')">
+                                <img src="${imgUrl}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy">
+                                <div class="absolute top-3 right-3 bg-dtm-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow border border-white/20">${item.categorie || 'Info'}</div>
+                            </div>
+                            <div class="p-6 flex flex-col flex-grow">
+                                <div class="text-xs text-gray-400 mb-2 flex items-center"><i class="fa-regular fa-calendar mr-2"></i> ${item.date || ''}</div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-3 leading-tight group-hover:text-dtm-primary transition-colors cursor-pointer" onclick="openReadModal('${docId}')">${item.titre}</h3>
+                                <p class="text-gray-600 text-sm line-clamp-3 mb-6 flex-grow">${item.description || ''}</p>
+                                <button onclick="openReadModal('${docId}')" class="text-dtm-primary font-bold text-sm hover:bg-blue-50 p-2 rounded-lg self-start mt-auto transition-colors">
+                                    Lire la suite <i class="fa-solid fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                if (targetId) {
+                    setTimeout(() => {
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement) targetElement.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    }, 500);
+                }
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = `<div class="col-span-full text-center text-red-500">Erreur de chargement.</div>`;
+            }
+        }
+
+        // --- GESTION DE LA MODALE ---
+        function openReadModal(id) {
+            // Trouver l'article correspondant dans notre variable globale
+            const article = allNewsData.find(item => item.id === id);
+
+            if (article) {
+                document.getElementById('modalImg').src = article.image;
+                document.getElementById('modalCat').innerText = article.categorie || 'Info';
+                document.getElementById('modalDate').innerText = article.date || '';
+                document.getElementById('modalTitle').innerText = article.titre;
+                document.getElementById('modalDesc').innerText = article.description; // Respecte les sauts de ligne grâce au CSS whitespace-pre-wrap
+
+                document.getElementById('readModal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Bloque le scroll arrière-plan
+            }
+        }
+
+        function closeReadModal() {
+            document.getElementById('readModal').classList.add('hidden');
+            document.body.style.overflow = 'auto'; // Réactive le scroll
+        }
+
+        loadNews();
+    </script>
+</body>
+
+</html>

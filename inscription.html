@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - DTM</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dtm: {light: '#e0f2fe', primary: '#0284c7', dark: '#0c4a6e'}
+                    },
+                    fontFamily: {sans: ['Montserrat', 'sans-serif']}
+                }
+            }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        body {
+            background-image: url('https://images.unsplash.com/photo-1638202993928-7267aad84c31?q=80&w=1920');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+        .glass-overlay { background-color: rgba(255, 255, 255, 0.92); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .input-std { @apply w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-dtm-primary focus:ring-2 focus:ring-dtm-light outline-none transition-all text-gray-800 placeholder-gray-400 font-medium; }
+        .label-std { @apply text-xs font-bold text-gray-500 uppercase ml-1 mb-1.5 block tracking-wide; }
+    </style>
+</head>
+
+<body>
+
+    <div id="notificationWrapper"
+        class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] pointer-events-none select-none w-full max-w-sm px-4 flex flex-col items-center gap-2">
+
+        <div id="successPopup"
+            class="bg-green-600/95 backdrop-blur-md text-white pl-4 pr-8 py-3 rounded-full shadow-2xl flex items-center space-x-4 transition-all duration-500 ease-out transform -translate-y-[250%] opacity-0 border border-green-500/50 w-auto">
+            <div class="bg-white/20 rounded-full h-10 w-10 flex items-center justify-center flex-shrink-0"><i
+                    class="fa-solid fa-check text-xl font-bold"></i></div>
+            <div>
+                <h4 class="font-bold text-base leading-none mb-1">Succès !</h4>
+                <p id="successText" class="text-sm text-green-100 leading-none">Opération réussie.</p>
+            </div>
+        </div>
+
+        <div id="errorPopup"
+            class="bg-red-600/95 backdrop-blur-md text-white pl-4 pr-8 py-3 rounded-full shadow-2xl flex items-center space-x-4 transition-all duration-500 ease-out transform -translate-y-[250%] opacity-0 border border-red-500/50 w-auto absolute">
+            <div class="bg-white/20 rounded-full h-10 w-10 flex items-center justify-center flex-shrink-0"><i
+                    class="fa-solid fa-xmark text-xl font-bold"></i></div>
+            <div>
+                <h4 class="font-bold text-base leading-none mb-1">Attention !</h4>
+                <p id="errorText" class="text-sm text-red-100 leading-none">Une erreur est survenue.</p>
+            </div>
+        </div>
+
+    </div>
+    <div class="glass-overlay py-12 px-4">
+        <div
+            class="w-full max-w-4xl bg-white rounded-3xl shadow-2xl p-8 md:p-12 border border-white/50 fade-in relative my-10 backdrop-blur-sm">
+
+            <a href="index.html"
+                class="absolute top-8 left-8 text-gray-400 hover:text-dtm-primary transition-colors duration-200"><i
+                    class="fa-solid fa-arrow-left text-xl"></i></a>
+
+            <div class="text-center mb-10">
+                <img src="logo.png" class="h-32 mx-auto mb-6 transition-transform hover:scale-105"
+                    onerror="this.src='https://cdn-icons-png.flaticon.com/512/1034/1034179.png'">
+                <h2 class="text-3xl md:text-4xl font-bold text-dtm-dark tracking-tight">Devenir Membre</h2>
+                <p class="text-gray-500 mt-2">Rejoignez le Dahira Touba Médecine UGB</p>
+            </div>
+
+            <form onsubmit="handleRegister(event)" class="space-y-6">
+
+                <div class="flex flex-col items-center mb-8">
+                    <div
+                        class="w-32 h-32 rounded-full bg-gray-50 border-4 border-dtm-light overflow-hidden mb-3 relative group shadow-inner">
+                        <img id="preview" class="w-full h-full object-cover hidden">
+                        <div id="placeholder"
+                            class="flex flex-col items-center justify-center h-full text-gray-400 transition-colors group-hover:text-dtm-primary">
+                            <i class="fa-solid fa-camera text-3xl mb-1"></i>
+                            <span class="text-[10px] font-bold">AJOUTER</span>
+                        </div>
+                    </div>
+                    <input type="file" id="userPhoto" accept="image/*" required onchange="previewImage(this)"
+                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-dtm-light file:text-dtm-dark hover:file:bg-blue-100 transition-colors mx-auto max-w-[250px] cursor-pointer">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><label class="label-std">Prénoms</label><input type="text" id="prenom" required
+                            class="input-std" placeholder="Ex: Serigne Saliou"></div>
+                    <div><label class="label-std">Nom</label><input type="text" id="nom" required class="input-std"
+                            placeholder="Ex: Mbacké"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div><label class="label-std">Date de naissance</label><input type="date" id="date_naissance"
+                            required class="input-std text-gray-500"></div>
+                    <div><label class="label-std">Lieu de naissance</label><input type="text" id="lieu_naissance"
+                            required class="input-std" placeholder="Ex: Diourbel"></div>
+                    <div><label class="label-std">Sexe</label><select id="sexe" required class="input-std bg-gray-50">
+                            <option value="">Sélectionner...</option>
+                            <option value="H">Homme</option>
+                            <option value="F">Femme</option>
+                        </select></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><label class="label-std">Téléphone (WhatsApp)</label><input type="tel" id="telephone" required
+                            class="input-std" placeholder="+221 77 ..."></div>
+                    <div><label class="label-std">Email</label><input type="email" id="email" required class="input-std"
+                            placeholder="exemple@gmail.com"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><label class="label-std">Adresse complète</label><input type="text" id="adresse" required
+                            class="input-std" placeholder="Ex: Sanar, Village P"></div>
+                    <div><label class="label-std">Ville</label><input type="text" id="ville" required class="input-std"
+                            placeholder="Ex: Saint-Louis"></div>
+                </div>
+
+                <div><label class="label-std">Statut dans le Dahira</label><select id="statut_dahira" required
+                        class="input-std bg-gray-50">
+                        <option value="">Sélectionner votre statut...</option>
+                        <option value="Interne">Interne (Membre actif résidant au campus)</option>
+                        <option value="Externe">Externe (Membre actif hors campus)</option>
+                        <option value="Sympathisant">Sympathisant</option>
+                    </select></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><label class="label-std">Statut actuel</label><input type="text" id="statut_pro" required
+                            class="input-std" placeholder="Ex: Étudiant, Médecin, Infirmier..."></div>
+                    <div><label class="label-std">Spécialité / Filière</label><select id="specialite" required
+                            class="input-std bg-gray-100 cursor-not-allowed">
+                            <option value="Médecine" selected>Médecine</option>
+                        </select></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><label class="label-std">Niveau d'étude</label><select id="niveau" required
+                            class="input-std bg-gray-50">
+                            <option value="">Sélectionner...</option>
+                            <option value="L1">Licence 1</option>
+                            <option value="L2">Licence 2</option>
+                            <option value="L3">Licence 3</option>
+                            <option value="M1">Master 1</option>
+                            <option value="M2">Master 2</option>
+                            <option value="Doctorat 1">Doctorat 1</option>
+                            <option value="Doctorat 2">Doctorat 2</option>
+                            <option value="These">Thèse</option>
+                            <option value="Internat">Internat</option>
+                            <option value="Diplome">Déjà Diplômé</option>
+                        </select></div>
+                    <div><label class="label-std">Année Scolaire</label><input type="text" id="annee_etude" required
+                            class="input-std" placeholder="Ex: 2024-2025"></div>
+                </div>
+
+                <div class="mt-4 bg-blue-50/50 p-6 rounded-2xl border border-blue-100">
+                    <label class="label-std mb-3 text-dtm-primary">Compétences (Choix multiples)</label>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-700 font-medium">
+                        <label
+                            class="flex items-center space-x-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors"><input
+                                type="checkbox" name="competences" value="Sante"
+                                class="w-5 h-5 accent-dtm-primary rounded"><span>Santé / Soins</span></label>
+                        <label
+                            class="flex items-center space-x-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors"><input
+                                type="checkbox" name="competences" value="Informatique"
+                                class="w-5 h-5 accent-dtm-primary rounded"><span>Informatique</span></label>
+                        <label
+                            class="flex items-center space-x-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors"><input
+                                type="checkbox" name="competences" value="Communication"
+                                class="w-5 h-5 accent-dtm-primary rounded"><span>Communication</span></label>
+                        <label
+                            class="flex items-center space-x-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors"><input
+                                type="checkbox" name="competences" value="Gestion"
+                                class="w-5 h-5 accent-dtm-primary rounded"><span>Gestion</span></label>
+                        <label
+                            class="flex items-center space-x-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors"><input
+                                type="checkbox" name="competences" value="Enseignement"
+                                class="w-5 h-5 accent-dtm-primary rounded"><span>Enseignement</span></label>
+                        <label
+                            class="flex items-center space-x-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors"><input
+                                type="checkbox" name="competences" value="Logistique"
+                                class="w-5 h-5 accent-dtm-primary rounded"><span>Logistique</span></label>
+                    </div>
+                </div>
+
+                <div><label class="label-std">Domaine d'engagement souhaité</label><select id="poste" required
+                        class="input-std bg-gray-50">
+                        <option value="Membre simple">Membre simple</option>
+                        <option value="Communication">Commission Communication</option>
+                        <option value="Social">Commission Sociale / Santé</option>
+                        <option value="Pedagogique">Commission Pédagogique</option>
+                        <option value="Organisation">Commission Organisation</option>
+                        <option value="Culturel">Commission Culturelle</option>
+                        <option value="Conservatoire">Commission Conservatoire</option>
+                        <option value="Finance">Commission Finances</option>
+                    </select></div>
+
+                <div><label class="label-std">Mot de passe (Connexion)</label><input type="password" id="password"
+                        required class="input-std" placeholder="••••••••"></div>
+
+                <div class="pt-8">
+                    <button type="submit" id="submitBtn"
+                        class="w-full bg-dtm-dark hover:bg-dtm-primary text-white font-bold py-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.01] text-lg tracking-wide uppercase">Valider
+                        l'inscription</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {getFirestore, collection, addDoc, getDocs, query, where} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // VOS CLES API
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9O7wvG2s-teRO5IehT5K1ozJ48S2nDDo",
+            authDomain: "dtm-ugb-officiel.firebaseapp.com",
+            projectId: "dtm-ugb-officiel",
+            storageBucket: "dtm-ugb-officiel.firebasestorage.app",
+            messagingSenderId: "871436265978",
+            appId: "1:871436265978:web:98bf9fb593bd6e46e3dc43",
+            measurementId: "G-1P30LZJHYJ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- 1. NOTIFICATION SUCCÈS (VERT) ---
+        function showSuccessNotification(message) {
+            const popup = document.getElementById('successPopup');
+            document.getElementById('successText').innerText = message;
+            popup.classList.remove('-translate-y-[250%]', 'opacity-0');
+            popup.classList.add('translate-y-0', 'opacity-100', 'scale-105');
+            setTimeout(() => {popup.classList.remove('scale-105');}, 200);
+        }
+
+        // --- 2. NOTIFICATION ERREUR (ROUGE) ---
+        function showErrorNotification(message) {
+            const popup = document.getElementById('errorPopup');
+            document.getElementById('errorText').innerText = message;
+            popup.classList.remove('-translate-y-[250%]', 'opacity-0');
+            popup.classList.add('translate-y-0', 'opacity-100', 'scale-105');
+
+            setTimeout(() => {popup.classList.remove('scale-105');}, 200);
+
+            // Disparait automatiquement après 4 secondes
+            setTimeout(() => {
+                popup.classList.remove('translate-y-0', 'opacity-100');
+                popup.classList.add('-translate-y-[250%]', 'opacity-0');
+            }, 4000);
+        }
+
+        window.previewImage = function (input) {
+            if (input.files && input.files[0]) {
+                // VÉRIFICATION TAILLE (Avant preview)
+                const file = input.files[0];
+                // 1 Mo = 1,000,000 octets environ
+                if (file.size > 1000000) {
+                    showErrorNotification("La photo est trop lourde ! Choisir une autre.");
+                    input.value = ""; // Annuler la sélection
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('preview').classList.remove('hidden');
+                    document.getElementById('placeholder').classList.add('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        window.handleRegister = async function (e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerText;
+            submitBtn.innerText = "Traitement en cours...";
+            submitBtn.disabled = true;
+
+            const photoInput = document.getElementById('userPhoto');
+            const file = photoInput.files[0];
+
+            if (!file) {
+                showErrorNotification("Photo obligatoire !");
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
+                return;
+            }
+
+            // DOUBLE VÉRIFICATION TAILLE
+            if (file.size > 1000000) {
+                showErrorNotification("La photo est trop lourde ! (Max 1 Mo)");
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
+                return;
+            }
+
+            const competences = [];
+            document.querySelectorAll('input[name="competences"]:checked').forEach(cb => competences.push(cb.value));
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+
+            reader.onload = async function () {
+                try {
+                    const email = document.getElementById('email').value;
+                    const q = query(collection(db, "membres"), where("email", "==", email));
+                    const qs = await getDocs(q);
+
+                    if (!qs.empty) {
+                        showErrorNotification("Cet email est déjà inscrit !");
+                        submitBtn.innerText = originalText;
+                        submitBtn.disabled = false;
+                        return;
+                    }
+
+                    const newUser = {
+                        id: 'DTM-' + Math.floor(1000 + Math.random() * 9000),
+                        prenom: document.getElementById('prenom').value,
+                        nom: document.getElementById('nom').value,
+                        date_naissance: document.getElementById('date_naissance').value,
+                        lieu_naissance: document.getElementById('lieu_naissance').value,
+                        sexe: document.getElementById('sexe').value,
+
+                        telephone: document.getElementById('telephone').value,
+                        email: email,
+                        adresse: document.getElementById('adresse').value,
+                        ville: document.getElementById('ville').value,
+
+                        statut_dahira: document.getElementById('statut_dahira').value,
+                        statut_pro: document.getElementById('statut_pro').value,
+
+                        // Ces champs ont été supprimés/modifiés, on garde pour la base
+                        universite: "UGB",
+
+                        niveau: document.getElementById('niveau').value,
+                        specialite: document.getElementById('specialite').value,
+                        annee_etude: document.getElementById('annee_etude').value,
+
+                        competences: competences,
+                        poste: document.getElementById('poste').value,
+
+                        password: document.getElementById('password').value,
+                        photo: reader.result,
+                        date: new Date().toLocaleDateString()
+                    };
+
+                    await addDoc(collection(db, "membres"), newUser);
+
+                    showSuccessNotification("Inscription réussie ! Redirection...");
+
+                    setTimeout(() => {
+                        window.location.href = "connexion.html";
+                    }, 2000);
+
+                } catch (error) {
+                    console.error("Erreur: ", error);
+                    // On utilise la notif rouge pour les erreurs techniques aussi
+                    showErrorNotification("Erreur technique : " + error.message);
+                    submitBtn.innerText = originalText;
+                    submitBtn.disabled = false;
+                }
+            };
+        }
+    </script>
+</body>
+
+</html>

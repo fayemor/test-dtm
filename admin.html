@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - DTM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {dtm: {light: '#e0f2fe', primary: '#0284c7', dark: '#0c4a6e'}},
+                    fontFamily: {sans: ['Montserrat', 'sans-serif']}
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0284c7 0%, #0c4a6e 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .glass-overlay {
+            background-color: rgba(255, 255, 255, 0.95);
+            min-height: 100vh;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bg-red-custom {
+            background-color: #fcebeb;
+            color: #cc3e3e;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="notificationWrapper"
+        class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] pointer-events-none select-none flex flex-col gap-3 w-full max-w-sm px-4">
+        <div id="successPopup"
+            class="bg-green-600/95 backdrop-blur-md text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center space-x-4 transition-all duration-500 ease-out transform -translate-y-[250%] opacity-0">
+            <div class="bg-white/20 rounded-full h-10 w-10 flex items-center justify-center flex-shrink-0"><i
+                    class="fa-solid fa-check text-xl"></i></div>
+            <div>
+                <h4 class="font-bold text-base leading-tight">Effectué !</h4>
+                <p id="successText" class="text-sm text-green-100">Opération réussie.</p>
+            </div>
+        </div>
+        <div id="warningPopup"
+            class="bg-orange-500/95 backdrop-blur-md text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center space-x-4 transition-all duration-500 ease-out transform -translate-y-[250%] opacity-0 absolute w-full">
+            <div class="bg-white/20 rounded-full h-10 w-10 flex items-center justify-center flex-shrink-0"><i
+                    class="fa-solid fa-triangle-exclamation text-xl"></i></div>
+            <div>
+                <h4 class="font-bold text-base leading-tight">Erreur</h4>
+                <p id="warningText" class="text-sm text-orange-100">Action impossible.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmModal"
+        class="fixed inset-0 z-[200] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
+        <div
+            class="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full text-center transform scale-100 transition-transform relative">
+            <button onclick="closeConfirm(false)"
+                class="absolute top-4 right-4 text-gray-300 hover:text-gray-500 transition-colors"><i
+                    class="fa-solid fa-xmark text-xl"></i></button>
+            <div
+                class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 text-red-500 shadow-sm">
+                <i class="fa-solid fa-trash-can text-2xl"></i></div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Êtes-vous sûr ?</h3>
+            <p id="confirmMessage" class="text-gray-500 text-sm mb-8 leading-relaxed">Cette action est irréversible.</p>
+            <div class="flex justify-center gap-3">
+                <button onclick="closeConfirm(false)"
+                    class="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-500 font-bold hover:bg-gray-50 transition-colors">Annuler</button>
+                <button id="confirmBtnAction"
+                    class="px-6 py-2.5 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 shadow-lg shadow-red-200 transition-transform hover:scale-105">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="userModal" class="fixed inset-0 z-[150] hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeUserModal()"></div>
+        <div
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-white rounded-2xl shadow-2xl h-auto max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="bg-dtm-dark p-6 text-white flex justify-between items-start shrink-0">
+                <div class="flex items-center space-x-4">
+                    <img id="modalUserPhoto" src=""
+                        class="w-16 h-16 rounded-full border-2 border-white object-cover bg-gray-500">
+                    <div>
+                        <h3 id="modalUserName" class="text-2xl font-bold">Prénom Nom</h3>
+                        <p id="modalUserId" class="text-sm opacity-80 font-mono">ID: DTM-000</p>
+                    </div>
+                </div>
+                <button onclick="closeUserModal()" class="text-white/70 hover:text-white"><i
+                        class="fa-solid fa-xmark text-2xl"></i></button>
+            </div>
+            <div class="p-8 overflow-y-auto" id="modalContent"></div>
+            <div class="p-4 bg-gray-50 border-t flex justify-end shrink-0"><button onclick="closeUserModal()"
+                    class="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-bold text-gray-700">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-overlay p-4">
+        <div id="adminLogin" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl mt-20 border border-gray-100">
+            <h2 class="text-2xl font-bold text-center mb-6 text-dtm-dark">Espace Admin Sécurisé</h2>
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div><label class="text-xs font-bold text-gray-500 ml-1">Email Admin</label><input type="email"
+                        id="adminEmail" placeholder="admin@dtm.sn" required
+                        class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-dtm-primary outline-none">
+                </div>
+                <div><label class="text-xs font-bold text-gray-500 ml-1">Mot de passe</label><input type="password"
+                        id="adminPassword" placeholder="••••••••" required
+                        class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-dtm-primary outline-none">
+                </div>
+                <button type="submit" id="loginBtn"
+                    class="w-full bg-dtm-dark text-white py-3 rounded-xl font-bold hover:bg-dtm-primary transition-colors shadow-lg mt-2">Connexion</button>
+            </form>
+            <p class="mt-4 text-center"><a href="index.html"
+                    class="text-gray-400 text-sm hover:text-dtm-primary">Retour</a></p>
+        </div>
+
+        <div id="adminPanel" class="hidden max-w-[95%] mx-auto fade-in mt-10 pb-20">
+            <div
+                class="flex flex-col md:flex-row justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm gap-4 border border-gray-100">
+                <h2 class="text-2xl font-bold text-dtm-dark pl-2">Administration</h2>
+                <div class="flex gap-3 flex-wrap">
+                    <button onclick="copyMailingList()"
+                        class="bg-blue-600 text-white px-5 py-2 rounded-lg font-bold shadow hover:bg-blue-700 flex items-center transition-colors"><i
+                            class="fa-solid fa-envelope mr-2"></i> Liste Emails</button>
+                    <button onclick="exportXLSX()"
+                        class="bg-green-600 text-white px-5 py-2 rounded-lg font-bold shadow hover:bg-green-700 flex items-center transition-colors"><i
+                            class="fa-solid fa-file-excel mr-2"></i> Excel</button>
+                    <button onclick="logoutAdmin()"
+                        class="bg-red-500 text-white px-5 py-2 rounded-lg font-bold shadow hover:bg-red-600 transition-colors"><i
+                            class="fa-solid fa-sign-out-alt mr-2"></i> Déconnexion</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                        <div class="p-4 border-b bg-gray-50 font-bold flex justify-between items-center">
+                            <span class="text-gray-700">Membres Inscrits</span>
+                            <span class="bg-dtm-primary text-white text-xs px-3 py-1 rounded-full" id="count">0</span>
+                        </div>
+                        <div class="overflow-x-auto max-h-[400px] overflow-y-auto">
+                            <table class="w-full text-sm text-left text-gray-500">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0">
+                                    <tr>
+                                        <th class="px-4 py-3">Photo</th>
+                                        <th class="px-4 py-3">Identité</th>
+                                        <th class="px-4 py-3">Poste</th>
+                                        <th class="px-4 py-3">Cotisation</th>
+                                        <th class="px-4 py-3 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                        <div class="p-4 border-b bg-gray-50 font-bold flex justify-between items-center">
+                            <span class="text-gray-700">Actualités</span>
+                            <button onclick="loadNewsAdmin()"
+                                class="text-xs text-dtm-primary font-bold hover:underline"><i
+                                    class="fa-solid fa-rotate mr-1"></i>Actualiser</button>
+                        </div>
+                        <div class="overflow-x-auto max-h-[400px] overflow-y-auto">
+                            <table class="w-full text-sm text-left text-gray-500">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0">
+                                    <tr>
+                                        <th class="px-4 py-3">Image</th>
+                                        <th class="px-4 py-3">Titre</th>
+                                        <th class="px-4 py-3">Date</th>
+                                        <th class="px-4 py-3 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="newsTbody" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 h-fit sticky top-4">
+                        <h3
+                            class="font-bold text-lg mb-6 border-b pb-2 flex justify-between items-center text-dtm-dark">
+                            <span id="formTitle"><i class="fa-solid fa-pen-nib mr-2"></i>Publier une Actualité</span>
+                            <button onclick="resetForm()" id="cancelEditBtn"
+                                class="hidden text-xs text-red-500 hover:bg-red-50 px-2 py-1 rounded transition-colors">Annuler</button>
+                        </h3>
+                        <form onsubmit="handleNewsSubmit(event)" class="space-y-4">
+                            <input type="hidden" id="editId"><input type="hidden" id="editImageUrl">
+                            <div><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Titre</label><input
+                                    type="text" id="newsTitle" placeholder="Titre..." required
+                                    class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dtm-primary outline-none">
+                            </div>
+                            <div><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Image</label><input
+                                    type="file" id="newsImage" accept="image/*"
+                                    class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-dtm-light file:text-dtm-dark hover:file:bg-blue-100 cursor-pointer border border-gray-300 rounded-lg">
+                                <p id="imageStatus" class="text-[10px] text-gray-400 mt-1 italic hidden">Image actuelle
+                                    conservée.</p>
+                            </div>
+                            <div><label
+                                    class="block text-xs font-bold text-gray-500 mb-1 uppercase">Catégorie</label><select
+                                    id="newsTag"
+                                    class="w-full border border-gray-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-dtm-primary outline-none">
+                                    <option value="Social">Social</option>
+                                    <option value="Formation">Formation</option>
+                                    <option value="Culturel">Culturel</option>
+                                    <option value="Info">Info</option>
+                                </select></div>
+                            <div><label
+                                    class="block text-xs font-bold text-gray-500 mb-1 uppercase">Description</label><textarea
+                                    id="newsDesc" rows="5" placeholder="Détails..." required
+                                    class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dtm-primary outline-none resize-none"></textarea>
+                            </div>
+                            <button type="submit" id="submitBtn"
+                                class="w-full bg-dtm-dark hover:bg-dtm-primary text-white font-bold py-3 rounded-xl transition-all shadow-md mt-2">Publier</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {getFirestore, collection, getDocs, doc, deleteDoc, addDoc, updateDoc} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import {getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {apiKey: "AIzaSyC9O7wvG2s-teRO5IehT5K1ozJ48S2nDDo", authDomain: "dtm-ugb-officiel.firebaseapp.com", projectId: "dtm-ugb-officiel", storageBucket: "dtm-ugb-officiel.firebasestorage.app", messagingSenderId: "871436265978", appId: "1:871436265978:web:98bf9fb593bd6e46e3dc43", measurementId: "G-1P30LZJHYJ"};
+        const IMGBB_API_KEY = "bcb309af5ba5fd83f606e684bd298174";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        let allUsersData = [];
+        let confirmResolver = null;
+
+        // Exports
+        window.handleAdminLogin = handleAdminLogin; window.logoutAdmin = logoutAdmin; window.delUser = delUser; window.viewUser = viewUser; window.closeUserModal = closeUserModal; window.exportXLSX = exportXLSX; window.handleNewsSubmit = handleNewsSubmit; window.deleteNews = deleteNews; window.startEditNews = startEditNews; window.shareNewsAdmin = shareNewsAdmin; window.resetForm = resetForm; window.loadNewsAdmin = loadNewsAdmin; window.showNotification = showNotification; window.closeConfirm = closeConfirm; window.copyMailingList = copyMailingList; window.validatePayment = validatePayment;
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('adminLogin').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+                loadMembers(); loadNewsAdmin();
+            } else {
+                document.getElementById('adminLogin').classList.remove('hidden');
+                document.getElementById('adminPanel').classList.add('hidden');
+            }
+        });
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const pass = document.getElementById('adminPassword').value;
+            const btn = document.getElementById('loginBtn');
+            try {
+                btn.innerText = "Vérification...";
+                await signInWithEmailAndPassword(auth, email, pass);
+                showNotification('success', "Connexion réussie");
+            } catch (error) {
+                showNotification('warning', "Email ou mot de passe incorrect.");
+                btn.innerText = "Connexion";
+            }
+        }
+
+        async function logoutAdmin() {await signOut(auth);}
+
+        function showNotification(type, message) {
+            const popup = document.getElementById(type === 'success' ? 'successPopup' : 'warningPopup');
+            const text = document.getElementById(type === 'success' ? 'successText' : 'warningText');
+            text.innerText = message;
+            popup.classList.remove('-translate-y-[250%]', 'opacity-0'); popup.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {popup.classList.remove('translate-y-0', 'opacity-100'); popup.classList.add('-translate-y-[250%]', 'opacity-0');}, 3000);
+        }
+
+        function showConfirmModal(message, confirmText = "Supprimer") {
+            const modal = document.getElementById('confirmModal');
+            document.getElementById('confirmMessage').innerText = message;
+            document.getElementById('confirmBtnAction').innerText = confirmText;
+            modal.classList.remove('hidden');
+            return new Promise((resolve) => {confirmResolver = resolve;});
+        }
+        function closeConfirm(result) {document.getElementById('confirmModal').classList.add('hidden'); if (confirmResolver) confirmResolver(result);}
+        document.getElementById('confirmBtnAction').onclick = () => closeConfirm(true);
+
+
+        // --- NOUVELLE FONCTION: VALIDER PAIEMENT ---
+        async function validatePayment(id) {
+            const confirmed = await showConfirmModal("Marquer la cotisation comme payée ?");
+            if (confirmed) {
+                try {
+                    const userRef = doc(db, "membres", id);
+                    await updateDoc(userRef, {cotisation_payee: true});
+                    loadMembers(); // Recharger pour mettre à jour le tableau
+                    showNotification('success', "Paiement validé !");
+                } catch (e) {
+                    showNotification('warning', "Erreur validation: " + e.message);
+                }
+            }
+        }
+
+
+        async function loadMembers() {
+            const tbody = document.getElementById('tbody'); tbody.innerHTML = '<tr><td colspan="6" class="text-center p-4">Chargement...</td></tr>';
+            try {
+                const snap = await getDocs(collection(db, "membres"));
+                document.getElementById('count').innerText = snap.size;
+                tbody.innerHTML = '';
+                allUsersData = [];
+                snap.forEach(docSnap => {
+                    const u = docSnap.data();
+                    u.firebaseId = docSnap.id;
+                    allUsersData.push(u);
+
+                    const isPaid = u.cotisation_payee === true;
+                    const statusText = isPaid ? 'Payée' : 'En attente';
+                    const statusClass = isPaid ? 'bg-green-100 text-green-700' : 'bg-red-custom text-red-700';
+
+                    const validateButton = isPaid
+                        ? `<button class="text-gray-400 p-1.5 rounded" disabled title="Déjà payé"><i class="fa-solid fa-check"></i></button>`
+                        : `<button onclick="validatePayment('${docSnap.id}')" class="text-green-500 hover:bg-green-50 p-1.5 rounded" title="Valider paiement"><i class="fa-solid fa-hand-holding-dollar"></i></button>`;
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50 border-b">
+                            <td class="px-4 py-3"><img src="${u.photo}" class="w-8 h-8 rounded-full object-cover border border-gray-200"></td>
+                            <td class="px-4 py-3"><div class="font-bold text-gray-800 text-xs">${u.prenom} ${u.nom}</div><div class="text-[10px] text-gray-400">${u.email || '-'}</div></td>
+                            <td class="px-4 py-3 text-xs font-bold text-dtm-primary">${u.poste}</td>
+                            
+                            <td class="px-4 py-3 text-xs">
+                                <span class="px-2 py-0.5 rounded-lg font-bold ${statusClass}">${statusText}</span>
+                            </td>
+
+                            <td class="px-4 py-3 text-center flex justify-center gap-2">
+                                ${validateButton}
+                                <button onclick="viewUser('${docSnap.id}')" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded" title="Voir détails"><i class="fa-solid fa-eye"></i></button>
+                                <button onclick="delUser('${docSnap.id}')" class="text-red-500 hover:bg-red-50 p-1.5 rounded" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                });
+            } catch (e) {console.error(e);}
+        }
+
+        function copyMailingList() {
+            if (allUsersData.length === 0) {showNotification('warning', "Aucun membre."); return;}
+            const emails = allUsersData.map(u => u.email).filter(e => e).join(',');
+            navigator.clipboard.writeText(emails).then(() => {
+                showNotification('success', `${allUsersData.length} emails copiés !`);
+            });
+        }
+
+        function viewUser(id) {
+            const user = allUsersData.find(u => u.firebaseId === id); if (!user) return;
+            document.getElementById('modalUserPhoto').src = user.photo;
+            document.getElementById('modalUserName').innerText = `${user.prenom} ${user.nom}`;
+            document.getElementById('modalUserId').innerText = `ID: ${user.id}`;
+            const comps = user.competences ? user.competences.join(', ') : 'Aucune';
+            document.getElementById('modalContent').innerHTML = `<div class="grid grid-cols-2 gap-6 text-sm"><div><h4 class="text-xs font-bold text-dtm-primary uppercase mb-2">Personnel</h4><p><span class="text-gray-500">Naissance:</span> ${user.date_naissance || '-'} à ${user.lieu_naissance || '-'}</p><p><span class="text-gray-500">Sexe:</span> ${user.sexe || '-'}</p><p><span class="text-gray-500">Adresse:</span> ${user.adresse || '-'}, ${user.ville || '-'}</p></div><div><h4 class="text-xs font-bold text-dtm-primary uppercase mb-2">Contacts</h4><p><span class="text-gray-500">Email:</span> ${user.email}</p><p><span class="text-gray-500">Tel:</span> ${user.telephone}</p><p class="mt-2"><span class="text-gray-500">Statut Dahira:</span> <span class="font-bold text-green-600">${user.statut_dahira || '-'}</span></p></div><div class="col-span-2 border-t pt-4"><h4 class="text-xs font-bold text-dtm-primary uppercase mb-2">Académique & Pro</h4><div class="grid grid-cols-2 gap-4"><p><span class="text-gray-500">Statut Pro:</span> ${user.statut_pro || '-'}</p><p><span class="text-gray-500">Université:</span> ${user.universite || '-'}</p><p><span class="text-gray-500">Niveau:</span> ${user.niveau}</p><p><span class="text-gray-500">Année:</span> ${user.annee_etude || '-'}</p><p><span class="text-gray-500">Spécialité:</span> ${user.specialite}</p><p><span class="text-gray-500">Commission:</span> ${user.poste}</p></div></div><div class="col-span-2 bg-gray-50 p-3 rounded-lg"><h4 class="text-xs font-bold text-dtm-primary uppercase mb-1">Compétences</h4><p class="italic text-gray-600">${comps}</p></div></div>`;
+            document.getElementById('userModal').classList.remove('hidden');
+        }
+        function closeUserModal() {document.getElementById('userModal').classList.add('hidden');}
+
+        async function delUser(id) {
+            const confirmed = await showConfirmModal("Voulez-vous vraiment supprimer ce membre ?");
+            if (confirmed) {await deleteDoc(doc(db, "membres", id)); loadMembers(); showNotification('success', "Membre supprimé.");}
+        }
+
+        async function exportXLSX() {
+            if (typeof XLSX === 'undefined') {showNotification('warning', "Librairie non chargée."); return;}
+            if (allUsersData.length === 0) {showNotification('warning', "Aucune donnée."); return;}
+            let data = [];
+            allUsersData.forEach(u => {data.push({ID: u.id, Prénom: u.prenom, Nom: u.nom, Sexe: u.sexe || '', Date_Naissance: u.date_naissance || '', Lieu: u.lieu_naissance || '', Email: u.email, Tel: u.telephone, Cotisation: u.cotisation_payee ? 'Payée' : 'Non Payée', Adresse: u.adresse || '', Ville: u.ville || '', Statut_Dahira: u.statut_dahira || '', Statut_Pro: u.statut_pro || '', Université: u.universite || '', Spécialité: u.specialite, Niveau: u.niveau, Année: u.annee_etude || '', Compétences: u.competences ? u.competences.join(', ') : '', Commission: u.poste});});
+            const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Membres"); XLSX.writeFile(wb, "Base_DTM.xlsx");
+            showNotification('success', "Export terminé !");
+        }
+
+        async function loadNewsAdmin() {
+            const tbody = document.getElementById('newsTbody'); tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4">Chargement...</td></tr>';
+            try {
+                const snap = await getDocs(collection(db, "actualites")); tbody.innerHTML = '';
+                if (snap.empty) {tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-xs text-gray-400">Aucune actualité</td></tr>'; return;}
+                snap.forEach(docSnap => {
+                    const item = docSnap.data(); const id = docSnap.id;
+                    const safeTitle = item.titre.replace(/'/g, "&apos;"); const safeDesc = (item.description || "").replace(/'/g, "&apos;").replace(/\n/g, " ");
+                    tbody.innerHTML += `<tr class="hover:bg-gray-50 border-b text-xs"><td class="px-4 py-3"><img src="${item.image}" class="w-10 h-10 object-cover rounded shadow-sm"></td><td class="px-4 py-3 font-bold truncate max-w-[150px]">${item.titre}</td><td class="px-4 py-3 text-gray-500">${item.date}</td><td class="px-4 py-3 flex justify-center gap-2"><button onclick="startEditNews('${id}', '${safeTitle}', '${item.categorie}', '${item.image}', \`${safeDesc}\`)" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded" title="Modifier"><i class="fa-solid fa-pen"></i></button><button onclick="shareNewsAdmin('${id}', '${safeTitle}')" class="text-green-600 hover:bg-green-50 p-1.5 rounded" title="Partager"><i class="fa-solid fa-share-nodes"></i></button><button onclick="deleteNews('${id}')" class="text-red-500 hover:bg-red-50 p-1.5 rounded" title="Supprimer"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                });
+            } catch (e) {console.error(e);}
+        }
+
+        async function shareNewsAdmin(id, title) {
+            const shareUrl = window.location.href.replace('admin.html', 'actualites.html') + '?id=' + id;
+            const shareData = {title: 'DTM UGB - Actualité', text: 'Regarde ça : ' + title, url: shareUrl};
+            if (navigator.share) {try {await navigator.share(shareData);} catch (err) { } } else {navigator.clipboard.writeText(shareUrl).then(() => {showNotification('success', "Lien copié !");});}
+        }
+
+        async function deleteNews(id) {
+            const confirmed = await showConfirmModal("Supprimer cette actualité ?");
+            if (confirmed) {await deleteDoc(doc(db, "actualites", id)); loadNewsAdmin(); showNotification('success', "Actualité supprimée.");}
+        }
+
+        function startEditNews(id, t, c, i, d) {document.getElementById('formTitle').innerHTML = '<i class="fa-solid fa-pen mr-2"></i>Modifier'; document.getElementById('submitBtn').innerText = "Mettre à jour"; document.getElementById('submitBtn').classList.replace('bg-dtm-dark', 'bg-blue-600'); document.getElementById('cancelEditBtn').classList.remove('hidden'); document.getElementById('imageStatus').classList.remove('hidden'); document.getElementById('editId').value = id; document.getElementById('editImageUrl').value = i; document.getElementById('newsTitle').value = t; document.getElementById('newsTag').value = c; document.getElementById('newsDesc').value = d; document.getElementById('newsImage').required = false; document.getElementById('formTitle').scrollIntoView({behavior: 'smooth'});}
+        function resetForm() {document.getElementById('formTitle').innerHTML = '<i class="fa-solid fa-pen-nib mr-2"></i>Publier une Actualité'; document.getElementById('submitBtn').innerText = "Publier"; document.getElementById('submitBtn').classList.replace('bg-blue-600', 'bg-dtm-dark'); document.getElementById('cancelEditBtn').classList.add('hidden'); document.getElementById('imageStatus').classList.add('hidden'); document.querySelector('form').reset(); document.getElementById('editId').value = ""; document.getElementById('newsImage').required = true;}
+
+        async function handleNewsSubmit(e) {
+            e.preventDefault(); const btn = document.getElementById('submitBtn'); const txt = btn.innerText; btn.disabled = true; btn.innerText = "Traitement...";
+            const id = document.getElementById('editId').value; const file = document.getElementById('newsImage').files[0]; let imgUrl = document.getElementById('editImageUrl').value;
+            if (!id && !file) {showNotification('warning', "Image requise."); btn.disabled = false; btn.innerText = txt; return;}
+            try {
+                if (file) {const fd = new FormData(); fd.append("image", file); const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {method: "POST", body: fd}); const json = await res.json(); imgUrl = json.data.url;}
+                const data = {titre: document.getElementById('newsTitle').value, description: document.getElementById('newsDesc').value, categorie: document.getElementById('newsTag').value, image: imgUrl, date: new Date().toLocaleDateString()};
+                if (id) await updateDoc(doc(db, "actualites", id), data); else await addDoc(collection(db, "actualites"), data);
+                showNotification('success', id ? "Actualité mise à jour !" : "Actualité publiée !"); resetForm(); loadNewsAdmin();
+            } catch (e) {showNotification('warning', "Erreur technique.");} finally {btn.disabled = false; btn.innerText = id ? "Mettre à jour" : "Publier";}
+        }
+    </script>
+</body>
+
+</html>

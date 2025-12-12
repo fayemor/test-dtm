@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil - DTM UGB</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {dtm: {light: '#e0f2fe', primary: '#0284c7', dark: '#0c4a6e'}},
+                    fontFamily: {sans: ['Montserrat', 'sans-serif']},
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'breath': 'breath 3s ease-in-out infinite', // Nouvelle animation pour le logo
+                    },
+                    keyframes: {
+                        fadeInUp: {'0%': {opacity: '0', transform: 'translateY(20px)'}, '100%': {opacity: '1', transform: 'translateY(0)'}},
+                        breath: { // Keyframes pour l'effet zoom-dézoom
+                            '0%, 100%': {transform: 'scale(1)'},
+                            '50%': {transform: 'scale(1.08)'},
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+        }
+
+        .hero-bg {
+            background-image: url('https://images.unsplash.com/photo-1638202993928-7267aad84c31?q=80&w=1920');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            position: relative;
+        }
+
+        .blue-overlay {
+            background: linear-gradient(to bottom, rgba(2, 132, 199, 0.85), rgba(12, 74, 110, 0.95));
+            position: absolute;
+            inset: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="notificationWrapper"
+        class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] pointer-events-none select-none">
+        <div id="warningPopup"
+            class="bg-orange-500/95 backdrop-blur-md text-white pl-4 pr-8 py-3 rounded-full shadow-2xl flex items-center space-x-4 transition-all duration-500 ease-out transform -translate-y-[250%] opacity-0 border border-orange-400/50">
+            <div class="bg-white/20 rounded-full h-10 w-10 flex items-center justify-center flex-shrink-0"><i
+                    class="fa-solid fa-lock text-xl font-bold"></i></div>
+            <div>
+                <h4 class="font-bold text-base leading-none mb-1">Accès restreint</h4>
+                <p id="warningText" class="text-sm text-orange-50 leading-none">Veuillez vous connecter d'abord.</p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="fixed w-full z-50 top-0 start-0 bg-white/95 backdrop-blur-md border-b shadow-sm transition-all">
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-2">
+
+            <a href="index.html" class="flex items-center space-x-3 group">
+                <img src="logo.png" class="h-14 md:h-20 w-auto transition-transform group-hover:scale-105"
+                    alt="DTM Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1034/1034179.png'">
+                <span class="self-center text-xl md:text-2xl font-bold text-dtm-dark hidden sm:block">DTM UGB</span>
+            </a>
+
+            <div class="flex md:order-2 items-center gap-4 md:gap-3">
+
+                <div class="flex items-center gap-5 md:hidden">
+                    <a href="#about" class="text-gray-500 hover:text-dtm-primary transition-colors">
+                        <i class="fa-solid fa-circle-info text-2xl"></i>
+                    </a>
+                    <a href="#news" class="text-gray-500 hover:text-dtm-primary transition-colors">
+                        <i class="fa-solid fa-newspaper text-2xl"></i>
+                    </a>
+                </div>
+
+                <a href="admin.html"
+                    class="hidden md:flex text-gray-500 hover:text-dtm-dark font-medium text-sm px-3 py-2 transition-colors items-center">
+                    <i class="fa-solid fa-user-shield mr-2"></i> Admin
+                </a>
+
+                <button onclick="document.getElementById('navbar').classList.toggle('hidden')"
+                    class="md:hidden p-2 text-gray-500 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-gray-200">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+            </div>
+
+            <div class="hidden w-full md:flex md:w-auto md:order-1" id="navbar">
+                <ul
+                    class="flex flex-col p-4 md:p-0 mt-4 font-medium md:flex-row md:space-x-8 md:mt-0 items-center bg-white md:bg-transparent rounded-xl md:rounded-none border md:border-none border-gray-100 shadow-lg md:shadow-none">
+
+                    <li><a href="#"
+                            class="block py-2 px-3 text-dtm-primary font-bold border-b-2 border-dtm-primary md:border-0">Accueil</a>
+                    </li>
+                    <li><a href="#about"
+                            class="block py-2 px-3 text-gray-700 hover:text-dtm-primary transition-colors">À Propos</a>
+                    </li>
+                    <li><a href="#news"
+                            class="block py-2 px-3 text-gray-700 hover:text-dtm-primary transition-colors">Actualités</a>
+                    </li>
+
+                    <li>
+                        <a href="https://www.xassidacloud.com" target="_blank"
+                            class="block py-2 px-3 text-gray-700 hover:text-dtm-primary transition-colors">
+                            XassidaCloud
+                        </a>
+                    </li>
+
+                    <li class="md:hidden w-full text-center border-t border-gray-100 mt-2 pt-2">
+                        <a href="admin.html" class="block py-2 px-3 text-gray-500 hover:text-dtm-dark">
+                            <i class="fa-solid fa-user-shield mr-1"></i> Espace Admin
+                        </a>
+                    </li>
+
+                    <li class="mt-4 md:mt-0">
+                        <button onclick="checkAccess()"
+                            class="block py-2 px-6 md:px-4 text-white bg-dtm-primary hover:bg-dtm-dark rounded-full transition-all shadow-md transform hover:scale-105 w-full md:w-auto">
+                            <i class="fa-solid fa-user-circle mr-2"></i>Mon Profil
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-bg min-h-[95vh] flex items-center justify-center pt-20 pb-16 px-4 relative">
+        <div class="blue-overlay"></div>
+        <div class="text-center max-w-4xl relative z-10 text-white animate-fade-in-up">
+            <h1 class="text-4xl md:text-7xl font-extrabold mb-6 tracking-tight leading-tight drop-shadow-lg">
+                Dahira Touba <br><span class="text-blue-200">Médecine</span>
+            </h1>
+            <p class="text-lg md:text-xl text-blue-50 mb-10 font-medium max-w-2xl mx-auto drop-shadow-md">
+                Université Gaston Berger de Saint-Louis.<br>
+                <span class="font-bold text-white">Union, Solidarité et Excellence</span> au service de la communauté
+                estudiantine et médicale.
+            </p>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4 md:gap-6 w-full max-w-md mx-auto md:max-w-none">
+                <a href="inscription.html"
+                    class="px-8 py-4 bg-white text-dtm-primary hover:bg-blue-50 text-lg font-bold rounded-full shadow-xl transition-transform hover:scale-105 flex items-center justify-center">
+                    <i class="fa-solid fa-user-plus mr-2"></i> Devenir Membre
+                </a>
+                <a href="connexion.html"
+                    class="px-8 py-4 bg-transparent border-2 border-white text-white hover:bg-white/10 text-lg font-bold rounded-full shadow-xl transition-transform hover:scale-105 flex items-center justify-center">
+                    <i class="fa-solid fa-right-to-bracket mr-2"></i> Se connecter
+                </a>
+            </div>
+
+            <a href="#about"
+                class="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white/80 hover:text-white transition-colors animate-bounce hidden md:block">
+                <i class="fa-solid fa-chevron-down text-3xl drop-shadow-md"></i>
+            </a>
+        </div>
+    </header>
+
+    <section id="about" class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-dtm-dark uppercase tracking-wide">Qui sommes-nous ?</h2>
+                <div class="w-20 h-1 bg-dtm-primary mx-auto mt-2 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="order-2 md:order-1">
+                    <p class="text-gray-600 leading-relaxed text-lg mb-6 text-justify">
+                        Le <strong>Dahira Touba Médecine (DTM)</strong> est une structure regroupant les étudiants et
+                        professionnels de santé mourides de l'Université Gaston Berger.
+                        Guidés par les enseignements de Cheikh Ahmadou Bamba, nous œuvrons pour l'excellence académique
+                        et l'entraide sociale.
+                    </p>
+                    <ul class="space-y-3 text-gray-700 mb-8">
+                        <li class="flex items-center"><i class="fa-solid fa-check-circle text-dtm-primary mr-3"></i>
+                            Accompagnement pédagogique</li>
+                        <li class="flex items-center"><i class="fa-solid fa-check-circle text-dtm-primary mr-3"></i>
+                            Actions sociales et médicales</li>
+                        <li class="flex items-center"><i class="fa-solid fa-check-circle text-dtm-primary mr-3"></i>
+                            Activités culturelles et religieuses</li>
+                    </ul>
+                    <a href="apropos.html"
+                        class="inline-block border-2 border-dtm-dark text-dtm-dark hover:bg-dtm-dark hover:text-white font-bold py-3 px-8 rounded-full transition-all">
+                        En savoir plus
+                    </a>
+                </div>
+                <div class="order-1 md:order-2 flex justify-center">
+                    <div
+                        class="relative w-full max-w-sm aspect-square bg-dtm-light rounded-full flex items-center justify-center p-8 shadow-inner">
+                        <img src="logo.png" class="w-3/4 h-auto drop-shadow-2xl animate-breath"
+                            onerror="this.src='https://cdn-icons-png.flaticon.com/512/1034/1034179.png'">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="news" class="py-20 bg-gray-50 border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <h2 class="text-3xl font-bold text-dtm-dark uppercase tracking-wide">Actualités</h2>
+                    <div class="w-20 h-1 bg-dtm-primary mt-2 rounded-full"></div>
+                </div>
+                <a href="actualites.html" class="text-dtm-primary font-bold hover:underline hidden sm:block">Voir tout
+                    <i class="fa-solid fa-arrow-right ml-1"></i></a>
+            </div>
+
+            <div id="homeNewsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="col-span-full text-center py-10 text-gray-400">
+                    <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-2"></i><br>Chargement des infos...
+                </div>
+            </div>
+
+            <div class="text-center mt-10 sm:hidden">
+                <a href="actualites.html"
+                    class="inline-block bg-dtm-light text-dtm-dark font-bold py-3 px-8 rounded-full">Voir toutes les
+                    actualités</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-dtm-dark text-white py-8 text-center">
+        <p class="text-sm opacity-80">
+            © 2025 Dahira Touba Médecine UGB.
+            <span class="hidden sm:inline">|</span>
+            <br class="sm:hidden">
+            <a href="mailto:dtm.ugb@gmail.com" class="text-white hover:text-dtm-light transition-colors font-medium">
+                dtm.ugb@gmail.com
+            </a>
+        </p>
+    </footer>
+
+    <script type="module">
+        import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {getFirestore, collection, getDocs, query, limit} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // VOS CLES (DTM-UGB-Officiel)
+        const firebaseConfig = {apiKey: "AIzaSyC9O7wvG2s-teRO5IehT5K1ozJ48S2nDDo", authDomain: "dtm-ugb-officiel.firebaseapp.com", projectId: "dtm-ugb-officiel", storageBucket: "dtm-ugb-officiel.firebasestorage.app", messagingSenderId: "871436265978", appId: "1:871436265978:web:98bf9fb593bd6e46e3dc43", measurementId: "G-1P30LZJHYJ"};
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadHomeNews() {
+            const container = document.getElementById('homeNewsContainer');
+            try {
+                const q = query(collection(db, "actualites"), limit(3));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    container.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500 bg-white rounded-xl shadow p-6">Aucune actualité récente.</div>`;
+                    return;
+                }
+
+                container.innerHTML = '';
+
+                querySnapshot.forEach((doc) => {
+                    const item = doc.data();
+                    const imgUrl = item.image || 'https://placehold.co/600x400?text=DTM';
+
+                    container.innerHTML += `
+                        <a href="actualites.html?id=${doc.id}" class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group block h-full flex flex-col">
+                            <div class="h-48 overflow-hidden relative bg-gray-200">
+                                <img src="${imgUrl}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy">
+                                <span class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded backdrop-blur-sm">${item.categorie || 'Info'}</span>
+                            </div>
+                            <div class="p-5 flex flex-col flex-grow">
+                                <div class="text-[10px] text-gray-400 mb-2 uppercase font-bold tracking-wide">${item.date || ''}</div>
+                                <h3 class="text-lg font-bold text-gray-800 mb-2 leading-tight group-hover:text-dtm-primary transition-colors line-clamp-2">${item.titre}</h3>
+                                <p class="text-gray-600 text-xs line-clamp-3 mb-4 flex-grow">${item.description || ''}</p>
+                                <span class="text-dtm-primary text-xs font-bold self-start mt-auto group-hover:underline">Lire l'article</span>
+                            </div>
+                        </a>
+                    `;
+                });
+
+            } catch (error) {
+                console.error("Erreur news home:", error);
+                container.innerHTML = `<div class="col-span-full text-center text-red-400 text-sm">Impossible de charger les actualités.</div>`;
+            }
+        }
+
+        window.checkAccess = function () {
+            const user = localStorage.getItem('dtm_currentUser');
+            if (user) {window.location.href = "dashboard.html";}
+            else {
+                const popup = document.getElementById('warningPopup');
+                const text = document.getElementById('warningText');
+                text.innerText = "Veuillez vous connecter pour accéder à votre espace.";
+                popup.classList.remove('-translate-y-[250%]', 'opacity-0'); popup.classList.add('translate-y-0', 'opacity-100');
+                setTimeout(() => {popup.classList.remove('translate-y-0', 'opacity-100'); popup.classList.add('-translate-y-[250%]', 'opacity-0');}, 3000);
+                setTimeout(() => {window.location.href = "connexion.html";}, 2000);
+            }
+        }
+
+        loadHomeNews();
+    </script>
+</body>
+
+</html>

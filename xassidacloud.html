@@ -1,0 +1,3907 @@
+<!doctype html>
+<html lang="fr" class="scroll-smooth">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Xassida Cloud — Bibliothèque Numérique</title>
+    <meta name="description" content="Une expérience de lecture spirituelle immersive. Xassidas, Livres et Vidéos." />
+    <meta name="theme-color" content="#020617" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <link rel="icon" href="logo.png" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    },
+                    colors: {
+                        gold: {
+                            50: '#FBF8F2',
+                            100: '#F5EFE0',
+                            200: '#EADBC1',
+                            300: '#DFC39D',
+                            400: '#D4A876', // Base Gold
+                            500: '#C68E4F',
+                            600: '#A67138',
+                            700: '#85562C',
+                            800: '#674125',
+                            900: '#543621',
+                        },
+                        midnight: {
+                            950: '#020617', // Main BG
+                            900: '#0B1221', // Card BG
+                            800: '#161F32', // Light Card
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'slide-up': 'slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': {opacity: '0'},
+                            '100%': {opacity: '1'},
+                        },
+                        slideUp: {
+                            '0%': {transform: 'translateY(30px)', opacity: '0'},
+                            '100%': {transform: 'translateY(0)', opacity: '1'},
+                        }
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base Reset & Variables */
+        :root {
+            --glass-bg: rgba(2, 6, 23, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.04);
+            --card-hover: rgba(255, 255, 255, 0.03);
+        }
+
+        body {
+            -webkit-tap-highlight-color: transparent;
+            background-color: #020617;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(212, 168, 118, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(11, 18, 33, 1) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* Scrollbar élégante */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Glassmorphism Soft */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Loader Élégant */
+        .loader-ring {
+            display: inline-block;
+            position: relative;
+            width: 40px;
+            height: 40px;
+        }
+
+        .loader-ring div {
+            box-sizing: border-box;
+            display: block;
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            margin: 4px;
+            border: 2px solid #D4A876;
+            border-radius: 50%;
+            animation: loader-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            border-color: #D4A876 transparent transparent transparent;
+        }
+
+        .loader-ring div:nth-child(1) {
+            animation-delay: -0.45s;
+        }
+
+        .loader-ring div:nth-child(2) {
+            animation-delay: -0.3s;
+        }
+
+        .loader-ring div:nth-child(3) {
+            animation-delay: -0.15s;
+        }
+
+        @keyframes loader-ring {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Splash Fade */
+        #splashScreen {
+            transition: opacity 0.8s ease-out, visibility 0.8s;
+        }
+
+        #splashScreen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Typography Utilities */
+        .text-shadow-sm {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .text-gradient-gold {
+            background: linear-gradient(135deg, #F5EFE0 0%, #D4A876 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+
+<body class="text-slate-300 antialiased selection:bg-gold-500/30 selection:text-gold-100 min-h-screen flex flex-col">
+
+    <!-- Splash Screen (Minimalist) -->
+    <div id="splashScreen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-midnight-950">
+        <div class="flex flex-col items-center animate-slide-up space-y-6">
+            <div
+                class="relative w-24 h-24 rounded-full overflow-hidden border border-white/5 shadow-2xl shadow-gold-900/20">
+                <img src="logo.png" onerror="this.src='https://placehold.co/100x100/161F32/D4A876?text=XC'"
+                    class="w-full h-full object-cover opacity-90">
+            </div>
+            <div class="text-center space-y-2">
+                <h1 class="text-2xl font-serif text-gold-200 tracking-wide">Xassida Cloud</h1>
+                <div class="h-[1px] w-12 bg-gold-500/30 mx-auto"></div>
+                <p class="text-xs text-slate-500 uppercase tracking-[0.2em]">Bibliothèque Numérique</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Glow -->
+    <div
+        class="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-gold-600/5 blur-[120px] rounded-full pointer-events-none z-[-1]">
+    </div>
+    <div
+        class="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-900/10 blur-[120px] rounded-full pointer-events-none z-[-1]">
+    </div>
+
+    <!-- Header (Floating Glass) -->
+    <header id="mainHeader" class="fixed top-0 left-0 right-0 z-40 transition-transform duration-500">
+        <div class="glass-panel">
+            <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+
+                <!-- Brand -->
+                <div class="flex items-center gap-4 cursor-pointer group" onclick="app.router('home')">
+                    <img src="logo.png" onerror="this.style.display='none'"
+                        class="w-10 h-10 rounded-lg object-contain opacity-90 group-hover:opacity-100 transition-opacity">
+                    <div class="hidden sm:block">
+                        <h1
+                            class="font-serif text-lg text-slate-200 tracking-wide group-hover:text-gold-200 transition-colors">
+                            Xassida Cloud</h1>
+                    </div>
+                </div>
+
+                <!-- Desktop Nav (Pill style) -->
+                <nav
+                    class="hidden md:flex items-center gap-1 bg-white/5 rounded-full p-1.5 border border-white/5 backdrop-blur-md shadow-lg">
+                    <button onclick="app.router('home')" data-target="home"
+                        class="nav-item px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:text-white text-slate-400">Accueil</button>
+                    <button onclick="app.router('xassidas')" data-target="xassidas"
+                        class="nav-item px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:text-white text-slate-400">Xassidas</button>
+                    <button onclick="app.router('livres')" data-target="livres"
+                        class="nav-item px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:text-white text-slate-400">Livres</button>
+                    <button onclick="app.router('videos')" data-target="videos"
+                        class="nav-item px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:text-white text-slate-400">Vidéos</button>
+                </nav>
+
+                <!-- Right Actions -->
+                <div class="flex items-center gap-4">
+                    <!-- Search Trigger Mobile? (Optional, search is prominent in hero) -->
+                    <button class="p-2 text-slate-400 hover:text-gold-300 transition-colors">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 pt-28 pb-10">
+
+        <!-- HOME PAGE -->
+        <section id="page-home" class="animate-fade-in space-y-16">
+
+            <!-- Hero Section (Centered & Clean) -->
+            <div class="relative py-16 md:py-24 flex flex-col items-center text-center space-y-8">
+
+                <!-- Badge -->
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gold-500/20 bg-gold-500/5 backdrop-blur-sm">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse"></span>
+                    <span class="text-[10px] uppercase tracking-widest text-gold-300 font-medium">Bibliothèque
+                        Universelle</span>
+                </div>
+
+                <!-- Title -->
+                <h1 class="max-w-3xl text-4xl md:text-6xl lg:text-7xl font-serif text-slate-100 leading-tight">
+                    La Sagesse de <br>
+                    <span class="text-gradient-gold italic pr-2">Touba</span> à portée de main.
+                </h1>
+
+                <!-- Subtitle -->
+                <p class="max-w-xl text-lg text-slate-400 font-light leading-relaxed">
+                    Explorez une collection digitalisée de Xassidas, livres rares et conférences. Une interface
+                    apaisante pour votre lecture quotidienne.
+                </p>
+
+                <!-- Main Search Bar -->
+                <div class="w-full max-w-xl relative group mt-4">
+                    <div
+                        class="absolute -inset-1 bg-gradient-to-r from-gold-600/20 to-blue-600/20 rounded-full blur opacity-50 group-hover:opacity-100 transition duration-500">
+                    </div>
+                    <div
+                        class="relative flex items-center bg-midnight-900/80 border border-white/10 rounded-full p-2 backdrop-blur-xl shadow-2xl">
+                        <div class="pl-4 text-slate-500">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input type="text" id="searchInput" placeholder="Rechercher un titre, un auteur..."
+                            class="w-full bg-transparent border-none focus:ring-0 text-slate-200 placeholder-slate-500 px-4 py-2 font-sans">
+                        <div class="hidden sm:block pr-2">
+                            <kbd
+                                class="hidden sm:inline-block px-2 py-1 text-xs text-slate-500 border border-white/10 rounded-md bg-white/5">⌘K</kbd>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Categories -->
+                <div class="flex flex-wrap justify-center gap-4 pt-4">
+                    <button onclick="app.router('xassidas')"
+                        class="px-6 py-2.5 rounded-full border border-white/10 hover:border-gold-500/30 hover:bg-gold-500/5 text-sm text-slate-300 hover:text-gold-200 transition-all duration-300">
+                        Lire un Xassida
+                    </button>
+                    <button onclick="app.router('videos')"
+                        class="px-6 py-2.5 rounded-full border border-white/10 hover:border-white/20 hover:bg-white/5 text-sm text-slate-300 transition-all duration-300">
+                        Voir les Vidéos
+                    </button>
+                </div>
+            </div>
+
+            <!-- Features / Grid Preview -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div onclick="app.router('xassidas')"
+                    class="glass-card p-8 rounded-2xl cursor-pointer hover:bg-white/5 transition-all duration-500 group">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-serif text-slate-100 mb-2">Xassidas</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Accédez aux écrits originaux de Cheikh Ahmadou
+                        Bamba en format haute définition.</p>
+                </div>
+                <!-- Card 2 -->
+                <div onclick="app.router('livres')"
+                    class="glass-card p-8 rounded-2xl cursor-pointer hover:bg-white/5 transition-all duration-500 group">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-serif text-slate-100 mb-2">Ouvrages</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Une sélection de livres pour approfondir votre
+                        compréhension du Mouridisme.</p>
+                </div>
+                <!-- Card 3 -->
+                <div onclick="app.router('videos')"
+                    class="glass-card p-8 rounded-2xl cursor-pointer hover:bg-white/5 transition-all duration-500 group">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-serif text-slate-100 mb-2">Médiathèque</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Conférences, reportages et Zikrs des plus grands
+                        Kourels.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTENT PAGES (Xassidas, Livres, Videos) -->
+        <section id="page-content" class="hidden space-y-8 animate-slide-up">
+
+            <!-- Section Header -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
+                <div>
+                    <h2 id="sectionTitle" class="text-3xl md:text-4xl font-serif font-medium text-slate-100 mb-2">Titre
+                    </h2>
+                    <p id="sectionSubtitle" class="text-slate-500 font-light">Description de la section</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="itemCount"
+                        class="text-xs font-mono text-gold-400/80 bg-gold-500/5 px-3 py-1.5 rounded border border-gold-500/10">0
+                        items</span>
+                </div>
+            </div>
+
+            <!-- Grid -->
+            <div id="contentGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Dynamic Content -->
+            </div>
+
+            <!-- Pagination (Minimalist) -->
+            <div class="flex justify-center items-center pt-12 gap-4">
+                <button id="btnPrev"
+                    class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 disabled:opacity-30 transition-all text-slate-400">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <span id="pageIndicator" class="font-mono text-sm text-slate-500">1 / 1</span>
+                <button id="btnNext"
+                    class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 disabled:opacity-30 transition-all text-slate-400">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer (Simple & Elegant) -->
+    <footer class="mt-auto border-t border-white/5 bg-midnight-950">
+        <div
+            class="max-w-7xl mx-auto px-4 py-12 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+            <div class="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
+                <img src="logo.png" onerror="this.style.display='none'" class="w-6 h-6 rounded object-cover grayscale">
+                <span class="font-serif text-sm tracking-wider text-slate-300">Xassida Cloud</span>
+            </div>
+
+            <div class="text-sm text-slate-600 font-light">
+                <a href="mailto:xassidacloud@gmail.com"
+                    class="hover:text-gold-400 transition-colors">xassidacloud@gmail.com</a>
+                <span class="mx-3 text-white/5">|</span>
+                <span>&copy; 2024</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Nav Bar (Bottom) -->
+    <nav class="md:hidden fixed bottom-4 left-4 right-4 z-50">
+        <div
+            class="glass-panel rounded-2xl border border-white/10 shadow-2xl flex justify-between items-center px-6 py-4">
+            <button onclick="app.router('home')" data-target="home"
+                class="nav-mobile text-slate-500 hover:text-gold-400 transition-colors">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+            </button>
+            <button onclick="app.router('xassidas')" data-target="xassidas"
+                class="nav-mobile text-slate-500 hover:text-gold-400 transition-colors">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </button>
+            <button onclick="app.router('livres')" data-target="livres"
+                class="nav-mobile text-slate-500 hover:text-gold-400 transition-colors">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </button>
+            <button onclick="app.router('videos')" data-target="videos"
+                class="nav-mobile text-slate-500 hover:text-gold-400 transition-colors">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Universal Modal -->
+    <div id="universalModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-midnight-950/90 backdrop-blur-md transition-opacity duration-500"
+            onclick="app.closeModal()"></div>
+
+        <div
+            class="relative w-full max-w-5xl h-[80vh] bg-midnight-900 rounded-2xl overflow-hidden shadow-2xl flex flex-col border border-white/10 animate-slide-up transform scale-100">
+            <!-- Modal Header -->
+            <div
+                class="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-midnight-800/50 backdrop-blur-md">
+                <div class="overflow-hidden">
+                    <h3 id="modalTitle" class="text-base font-serif font-medium text-slate-100 truncate">Titre</h3>
+                    <p id="modalSubtitle" class="text-xs text-gold-400/80 truncate font-sans">Auteur</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="modalDownloadBtn"
+                        class="p-2 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-colors">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                    </button>
+                    <button onclick="app.closeModal()"
+                        class="p-2 rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-400 transition-colors">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Frame -->
+            <div class="flex-1 bg-black/50 relative">
+                <div class="absolute inset-0 flex items-center justify-center z-0">
+                    <div class="loader-ring">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+                <iframe id="modalFrame" class="w-full h-full border-0 relative z-10" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"
+        class="fixed top-24 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3 rounded-full bg-midnight-800 border border-gold-500/30 text-slate-200 shadow-2xl z-[110] transition-all duration-300 transform -translate-y-20 opacity-0 pointer-events-none backdrop-blur-md">
+        <span class="w-2 h-2 rounded-full bg-gold-500 animate-pulse"></span>
+        <span id="toastMsg" class="text-sm font-medium">Notification</span>
+    </div>
+
+    <script>
+        // Data
+        const XASSIDAS = [
+            {
+                id: 'xb_astahfiru_ar',
+                title: 'Astahfiroulaha bihi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1T3PMH2RzOWQLkogJT4p9ZO6uAaNGViwB/view?usp=drive_link'
+            },
+            {
+                id: 'xb_jazbu_ar',
+                title: 'Jazbul Quloob Ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1sd0ZrFOdPyAuVgAeUc1Dwv8Tiz-bSRjP/view?usp=drive_link'
+            },
+
+            {
+                id: 'xb_midadi_ar',
+                title: 'Midadi', author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1qP6z31dCZeDiBVYguCuk-XBOV3toonPn/view?usp=drive_link'
+            },
+
+            {
+                id: 'xb_mafatikhouljinan_ar',
+                title: 'Mafatikhoul Jinane Ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1pd1Qrl9g7pH_4I_84kPON4edwVThHKqh/view?usp=drive_link'
+            },
+
+
+            {
+                id: 'xb_wadjah-wadj_ar',
+                title: 'Wadjahtou Wajhiyajah',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1zXlKZl5HcS58m-0iud5mG-XJ18xiJNTt/view?usp=drive_link'
+            },
+
+            {
+                id: 'xb_adjaraboussama_ar',
+                title: 'Adjabani Raboussama',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1gS3U8Di-6nP7WfmhxbMnlu1V9b3v2z8_/view?usp=drive_link'
+            },
+
+
+            {
+                id: 'xb_sindidi_ar',
+                title: 'Sindidi Ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1l6H_cgOu0Oh-BYTkZegcz405AliTxMug/view?usp=drive_link'
+            },
+
+            {
+                id: 'xb_yaqinikitab_ar',
+                title: 'Yaqiini Kitaabulaahi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1b9KTwspNf05pgNMPL5K5tKhRFQOHUlsD/view?usp=drive_link'
+            },
+
+            {
+                id: 'xb_touhfatu_ar',
+                title: 'Touhfatoul Mutadarihiin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1ybWMyBFfHk3w5y3CcOnh6PHkLc3-a0pz/view?usp=drive_link'
+            },
+
+            {
+                id: 'xb_fawzeyni_ar',
+                title: 'Matlaboul Fawzeyni Ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1FVAdIRGOzOZW7xipZstsgCGFqwE5I1wl/view?usp=drive_link'
+            },
+
+            {
+                id: 'id_ab',
+                title: 'Abreuvoir-du-commensal-irwanoun nadiim',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/13nJseg2jivOGpaZ-UW81TFvapRMfcMDp/view?usp=drive_link'
+            },
+
+            {
+                id: 'id_achkouroulahah',
+                title: 'Achkouroul laha',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1DvI_wcyCViy2gzCC0IfTNSM8SfEyb_JU/view?usp=drive_link'
+            },
+
+            {
+                id: 'id_mughniyan',
+                title: 'Ahmadu_Muhniyan',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/10AXIq5hMy4yU_OWhTirdVbkRMfTI6UK1/view?usp=drive_link'
+            },
+
+            {
+                id: 'id_ahnaniyal',
+                title: 'Ahnaniyal',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1xyZ8FyOA8bA-rh3d-w51UQ7OCDLA0ul4/view?usp=drive_link'
+            },
+
+            {
+                id: 'id_ajabani xayru baxin',
+                title: 'Ajabani Xayru baa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1AhWmvmdQ7wTaJFdSJGkU9KE_xIH2QePT/view?usp=drive_link'
+            },
+
+            {
+                id: 'id_albaraka',
+                title: 'Al Baraka',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1DML-gxMMJxJRnE66z6XsLYiVmJnFuSWy/view?usp=drive_link'
+            },
+
+            {
+                id: 'id_alquraan',
+                title: 'Al Quraa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1XlpEh49HszA1sRMQABME5fg7SOtxG8n9/view?usp=drive_link'
+            },
+
+            {
+                id: 'id_alkhaqu',
+                title: 'Al Haqqu Min rabikum',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1chIamPTDvkvilWa1p7opIWRGZb9smmOL/view?usp=drive_link'
+            },
+
+            {
+                id: 'id_alionii',
+                title: 'Ala inani Ousni',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1HtK2A115fzw8vAsxbl2Hi2Wpi_XWd7Vj/view?usp=drive_link'
+            },
+
+            {
+                id: 'id_nashrah',
+                title: 'Alam Nashrah',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/18-DGSgyUJcOV1BdssFY0JOzNtVIBE0uP/view?usp=drive_link'
+            },
+
+            {
+                id: 'id_albaqii',
+                title: 'Al Baaqi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1I8T_iZLsaC2MlXy4yvgROEl2wRmT4g90/view?usp=drive_link'
+            },
+
+            {
+                id: 'id_ahamdoullhl',
+                title: 'Alhamdoulilahi Halaa Louha',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1YPxtbZJ8umHqePu2qp3p5ExPaeX8eYvN/view?usp=drive_link'
+            },
+
+            {
+                id: 'id_alharhmn',
+                title: 'Alhamdoulilahi Rabil Haalamiina',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/18auHjhjYqBTfaYWjpL02Hctgj_g7uCoJ/view?usp=drive_link'
+            },
+
+            {
+                id: '50',
+                title: 'Alhamdoulilahi lezi mate zahab',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1DXi2FvO-1Z8qKKRISCeNQ-zmSq3ZYyrM/view?usp=drive_link'
+            },
+
+            {
+                id: '51',
+                title: 'Allahu Ihfaz',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1jAly_bWkRi7pqAcHjTLuAX3lWbqfNl_i/view?usp=drive_link'
+            },
+
+            {
+                id: '52',
+                title: 'Allahu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1TilpRR7mc-dQbfy5P1p5BqXuQ9Bhn3wm/view?usp=drive_link'
+            },
+
+            {
+                id: '53',
+                title: 'Allahul Khariibu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1-U0Rk6bMnrZ87Z7-Crc0PpuvrTanHcYn/view?usp=drive_link'
+            },
+
+            {
+                id: '54',
+                title: 'Anta Rabbii_ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1d_eLfoC2Yj2Y4sAa_y2DdFIDuH805oX-/view?usp=drive_link'
+            },
+
+            {
+                id: '55',
+                title: 'Anta Rabii_fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/18iKJbTz4DLexDS-QnFPg-kt41Q-Sk8qv/view?usp=drive_link'
+            },
+
+            {
+                id: '56',
+                title: 'Ashinu Muhjamatan',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1_QlQ6lYMQ__yFtmxP5BZnr91UDhpk_of/view?usp=drive_link'
+            },
+
+            {
+                id: '57',
+                title: 'Asma-u-Ahli badrin-kiraam',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1NsEi6EAwD9ZASHYdCaHYftC1JCKcx0B-/view?usp=drive_link'
+            },
+
+
+            {
+                id: '58',
+                title: 'Asma-ul-lahi husnaa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/14H8BQBI76A4g7asXT4IBWLGbgxlm-dh3/view?usp=drive_link'
+            },
+
+            {
+                id: '59',
+                title: 'Alhamdoulilahi lezi mate zahab',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1ZqVYGbxaSswXP8mNPlwSp61bTo0Fw9ej/view?usp=drive_link'
+            },
+
+            {
+                id: '60',
+                title: 'Alif Laam miim zaalikal kitaabu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1DXi2FvO-1Z8qKKRISCeNQ-zmSq3ZYyrM/view?usp=drive_link'
+            },
+
+            {
+                id: '61',
+                title: 'Allaahu_ihfaz',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1jAly_bWkRi7pqAcHjTLuAX3lWbqfNl_i/view?usp=drive_link'
+            },
+
+            {
+                id: '62',
+                title: 'Anta-Rabi-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/18iKJbTz4DLexDS-QnFPg-kt41Q-Sk8qv/view?usp=drive_link'
+            },
+
+            {
+                id: '63',
+                title: 'Allaahu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1TilpRR7mc-dQbfy5P1p5BqXuQ9Bhn3wm/view?usp=drive_link'
+            },
+
+            {
+                id: '64',
+                title: 'Allahul Khariibu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1-U0Rk6bMnrZ87Z7-Crc0PpuvrTanHcYn/view?usp=drive_link'
+            },
+
+            {
+                id: '65',
+                title: 'Anta_Rabbii Ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1d_eLfoC2Yj2Y4sAa_y2DdFIDuH805oX-/view?usp=drive_link'
+            },
+
+            {
+                id: '66',
+                title: 'Ashinu muhjamatan',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1_QlQ6lYMQ__yFtmxP5BZnr91UDhpk_of/view?usp=drive_link'
+            },
+
+            {
+                id: '67',
+                title: 'Asma-u_Alhli_badrine_Kiram',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1NsEi6EAwD9ZASHYdCaHYftC1JCKcx0B-/view?usp=drive_link'
+            },
+
+            {
+                id: '68',
+                title: 'Asma-ul_lahi_husnaa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1NsEi6EAwD9ZASHYdCaHYftC1JCKcx0B-/view?usp=drive_link'
+            },
+
+            {
+                id: '69',
+                title: 'Asmaou_tahlil_1',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1AaDI5-SKXkAZbUfG_-fkuJXjahQT2HbR/view?usp=drive_link'
+            },
+
+            {
+                id: '70',
+                title: 'Assiiru Ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/15K5iKpk1lAU6WeoYZBc6o9Iqq5vn-uMS/view?usp=drive_link'
+            },
+
+            {
+                id: '71',
+                title: 'Assiiru Fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1f6pQB1i8HyBIjJBT_aRdNyyzryo91lah/view?usp=drive_link'
+            },
+
+            {
+                id: '72',
+                title: 'Astahfirul_laha_bihi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1C4CYz6SiyJtgwK3o2UWhIIhuZL2TbIJl/view?usp=drive_link'
+            },
+
+            {
+                id: '73',
+                title: 'Baayahtu Xayral-Waraa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1-gh7lPeTIPG_rbpbzAWc5Cr115rSLiNc/view?usp=drive_link'
+            },
+
+            {
+                id: '74',
+                title: 'Astahfirul_laha_bihi Ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1C4CYz6SiyJtgwK3o2UWhIIhuZL2TbIJl/view?usp=drive_link'
+            },
+
+            {
+                id: '75',
+                title: 'Astahfirul_laha_bihi Wolof',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1UegGHLCvfLnn_p_IGXdtonJEdh1cBn_E/view?usp=drive_link'
+            },
+
+            {
+                id: '76',
+                title: 'Axiru_zaman-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1kuh_Xg7Hb-vJRKyeMc1Z_FqI_yhsmUwn/view?usp=drive_link'
+            },
+
+            {
+                id: '77',
+                title: 'Axiru_zaman-en',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/152VpBK4XeSgWJw6XHZkEoZUxtqxUYpaH/view?usp=drive_link'
+            },
+
+            {
+                id: '78',
+                title: 'Ayassa_Minilahu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1YFkGs08KtwA0MAYhjUDsp3NMZTkEI_xm/view?usp=drive_link'
+            },
+
+            {
+                id: '79',
+                title: 'Bah_bakhaa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1BArseXFEMH53eFinM8nPVPQWgXODnn84/view?usp=drive_link'
+            },
+
+            {
+                id: '80',
+                title: 'Balsasin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1H6Vq8uOC_M0jHwC_Qgl-toCxN1ieR8Yt/view?usp=drive_link'
+            },
+
+            {
+                id: '81',
+                title: 'Bi MUHAMMADIN_UNBIHTU',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1-YfigoLSpWAcY4QKVNc2T-sY2tQjXZub/view?usp=drive_link'
+            },
+
+            {
+                id: '82',
+                title: 'Barakatul_Lezii',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/13C5Os1ntwrxPNb2gBwmcUgVul82iHaJs/view?usp=drive_link'
+            },
+
+            {
+                id: '83',
+                title: 'Bi Bismillaahi Rahmaanir Rahiimi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1px6vKEL3Jc8raGwqZsQBxMwmKIRV6hA7/view?usp=drive_link'
+            },
+
+            {
+                id: '84',
+                title: 'Bi yawmil ahadi Safar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1ksg9z-4lv1N1_7xVQBmPz24EXdNQubsL/view?usp=drive_link'
+            },
+
+            {
+                id: '85',
+                title: 'Chahbanu Bamsachine-Kouniyyi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/140jFlHOJIfEXAyBpT3idcSrAxULwh8Ba/view?usp=drive_link'
+            },
+
+            {
+                id: '86',
+                title: 'BISMIL HANLIIMI',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/13zuIs1vkggg1t2AiYGPI3fAplMZ17SMA/view?usp=drive_link'
+            },
+
+            {
+                id: '87',
+                title: 'Bismil_ilaahi_ikfini_1',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1awpkXaReQVWielEgdpCfaFaF05KmwW6Q/view?usp=drive_link'
+            },
+
+            {
+                id: '88',
+                title: 'Bismilaahil_lezi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1iiFHZK_i-LIhSBgDVajJUucUm6Z0DRna/view?usp=drive_link'
+            },
+
+            {
+                id: '89',
+                title: 'Bismillaahi madaytu bilaa waqfin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1EDYSa2Z8280mkoknBj-z9-8oS1m3FdKv/view?usp=drive_link'
+            },
+
+            {
+                id: '90',
+                title: 'Bouchraa_lana',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1nxqJ_d2vFbNGcHra_Tf_kmMap_YSsTna/view?usp=drive_link'
+            },
+
+            {
+                id: '91',
+                title: 'Busaaraatin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/15HxCpQyvj22wq2AMANy2DwoNWaVkADVE/view?usp=drive_link'
+            },
+
+            {
+                id: '92',
+                title: 'Bushraanaa jamsashunaa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1fGeXzDvARlIU1TAjFq-CrSNfXdJKp2JG/view?usp=drive_link'
+            },
+
+            {
+                id: '93',
+                title: 'Calendrier khassida',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1h9_O7YdPOB4T8SrH-2YQGOUHyKduiJw-/view?usp=drive_link'
+            },
+
+            {
+                id: '94',
+                title: 'Causeries Aspirant Veridique',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1UsP0ZBcA9vJhK8cOcDuvoDl8OFXnDtyf/view?usp=drive_link'
+            },
+
+            {
+                id: '95',
+                title: 'Chahrou Safar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1FRX185gdHw8XpEJpFOX5W2vDN5KVIrzI/view?usp=drive_link'
+            },
+
+            {
+                id: '96',
+                title: 'Diamsachin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1mZ4CFMk9IGINgeUFTRBuO83QbG7RSBnn/view?usp=drive_link'
+            },
+
+            {
+                id: '97',
+                title: 'Diazboul Murid-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1pc2sU5CagvTsyb1snx31RGeEZ7zTblqz/view?usp=drive_link'
+            },
+
+            {
+                id: '98',
+                title: 'Jazbou-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1jjCfO6r1L2jEw2GJitsj_RpSll_nSjgW/view?usp=drive_link'
+            },
+
+            {
+                id: '99',
+                title: 'Dollu gammu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1kvPwOGzvHmox7_eQJYB0tfaAOZWF2S1f/view?usp=drive_link'
+            },
+
+            {
+                id: '100',
+                title: 'Durrussamin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1xtd9Sm_OTEJSd8XjctP6GYIx2ypBLyvP/view?usp=drive_link'
+            },
+
+            {
+                id: '101',
+                title: 'Faakha diamiha',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1NFXGUSjjXBOc2oQgKsyHcJcQEwFwLjoS/view?usp=drive_link'
+            },
+
+            {
+                id: '102',
+                title: 'FAATIHATUL KITAAB',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1C6yI6bAW8JROo6Faw_zm-TdHKjtg0MUS/view?usp=drive_link'
+            },
+
+            {
+                id: '103',
+                title: 'Faazal_laziina_2',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1t_bfaCCQYXoQsgB6hm1oooc64ULb52go/view?usp=drive_link'
+            },
+
+            {
+                id: '104',
+                title: 'Faazat_qilaami_1',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/11HRuwMPUdkNfZHPOoPAgl4Ov8eO-1oB2/view?usp=drive_link'
+            },
+
+            {
+                id: '105',
+                title: 'Fajaa-ani',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1dbDl8A1tqVcDaJk2d5MSb8tSkj-gQQEw/view?usp=drive_link'
+            },
+
+            {
+                id: '106',
+                title: 'Farixa Xayrul-mursali',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1TumkRFmcoEvvALz3jgqeYMfMd8KuSYou/view?usp=drive_link'
+            },
+
+            {
+                id: '107',
+                title: 'Farixa Xayrul Bassari',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1W5yXHXeU9T7cgPm49rTj6DnZDxIg6b9w/view?usp=drive_link'
+            },
+
+            {
+                id: '108',
+                title: 'Farij_Bijahil_Mustafa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1cK6e69BLSqRgD1nIHW9X1bGgNTme_O62/view?usp=drive_link'
+            },
+
+            {
+                id: '109',
+                title: 'Fathil fattah fii madhil miftah',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1sgWGBYTKDLqg2PyyiqTpWWBaVgijuQQr/view?usp=drive_link'
+            },
+
+            {
+                id: '110',
+                title: 'Fathoul Ghafar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1c_fm4-FKXjZHmHSKG2HtTXsi6gp5mWzu/view?usp=drive_link'
+            },
+
+            {
+                id: '111',
+                title: 'Fathoul-Moukarrimi-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1lJvKn2iFPm3y4QRfTYMJYmkymgQFH5X6/view?usp=drive_link'
+            },
+
+            {
+                id: '112',
+                title: 'Fathulmanan-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1H5200Rzoh0G38FKFB8w77vsyNJGqx_Me/view?usp=drive_link'
+            },
+
+            {
+                id: '113',
+                title: 'Fihi_shifa un-lin_naas',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1CKflpLuDLoZOVFQ7kZ5befPlfILsZHFj/view?usp=drive_link'
+            },
+
+            {
+                id: '114',
+                title: 'Fi cheuhri ramadaana haama alssachin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1VL9KmWiLZHLrqu-rY-u_c8_Kh9yyTDoz/view?usp=drive_link'
+            },
+
+            {
+                id: '115',
+                title: 'FIri_Wasful_muriid_shifaatu shaadiqil_muriid_wolof-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1hoP4McaFrqGeEmMQnUAvo2Ig9xaqhIgV/view?usp=drive_link'
+            },
+
+            {
+                id: '116',
+                title: 'Fuzti-Felicite-A-Toi-Marie',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1yjrC329Ci9G6jf0Vwo80pfKng1U_DRPX/view?usp=drive_link'
+            },
+
+            {
+                id: '117',
+                title: 'Haajat_Khassa-idi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1CruNM8PQf_uefKHlSVReF48w9Y65mfwJ/view?usp=drive_link'
+            },
+
+            {
+                id: '118',
+                title: 'Haama_Saxidnaa_bikaramin_2',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/13oj1f-GiHwezwcezVYyrlbxEcXh3JPRL/view?usp=drive_link'
+            },
+
+            {
+                id: '119',
+                title: 'Hadaanii-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1irfifhaHJvsg6Pbw8tcMEi3_NIGgFNQN/view?usp=drive_link'
+            },
+
+            {
+                id: '120',
+                title: 'Hadiyati',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/16Ph-B0Q8BcNp9nq2yduic83IVIb69VNb/view?usp=drive_link'
+            },
+
+            {
+                id: '121',
+                title: 'Halal_muntakha_Qayril_2',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1F3Z--1eDZyEBGVeche0N48gqz0Z1Lc8H/view?usp=drive_link'
+            },
+
+            {
+                id: '122',
+                title: 'Halayka yaa moukhtarou',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1HpDxV2_2Yqs6fNH5TOQPqJOOgOfxv2Vl/view?usp=drive_link'
+            },
+
+            {
+                id: '123',
+                title: 'Hamat_Sulayma',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1pVH8kos7CQdFWDX3x2im4nub2ytMSqwu/view?usp=drive_link'
+            },
+
+            {
+                id: '124',
+                title: 'Hamidtou rabi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1JucL-uyRnm1wKq4E6InHF0jSs0FkHHeU/view?usp=drive_link'
+            },
+
+            {
+                id: '125',
+                title: 'hamndii_wa_sukri_liman',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1n5ulhrvU_SkwIfov7hxQI4sp4NYeg0Hc/view?usp=drive_link'
+            },
+
+            {
+                id: '126',
+                title: 'Hasbounallaha - Hamdan',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1NFIjBUzus01p6sHs8yP-Xbmp1x_mqLpM/view?usp=drive_link'
+            },
+
+            {
+                id: '127',
+                title: 'Hazal Hawli',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1dH7wpwjL-fBzIQfcoxxGPYlVA3P-1XVK/view?usp=drive_link'
+            },
+
+
+            {
+                id: '129',
+                title: 'Hijaabu daarayni',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1yAM-AUXU2u8-YCAfR0feeFpSAwVvUK5R/view?usp=drive_link'
+            },
+
+            {
+                id: '130',
+                title: 'Hisnoul Abrar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1imWLDrVNJrxg7q3msXQYREoyF9qyadaQ/view?usp=drive_link'
+            },
+
+            {
+                id: '131',
+                title: 'Huqal Bukaa wolof',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Gmd6lCcQx1uvNfj3QiKrdwR2yGGOXkqe/view?usp=drive_link'
+            },
+
+            {
+                id: '132',
+                title: 'Huqqal_Bukaa_u',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1dMgirzkx_AACIL3AybVURybPZBcisV5s/view?usp=drive_link'
+            },
+
+            {
+                id: '133',
+                title: 'Huqqal bukaa-u-en',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/140pyP9Kf339f2KN0zJL1ODBEwq7mXPoi/view?usp=drive_link'
+            },
+
+            {
+                id: '134',
+                title: 'Huqqal Bukaa-u-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1xdz94szJyvi8ZzO9DFGpGKsb5OwDS7hU/view?usp=drive_link'
+            },
+
+            {
+                id: '135',
+                title: 'Ihdi jamihaanas wolof',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/151MfAmdrCav1bTRFdj0wB9an3BdYWvCY/view?usp=drive_link'
+            },
+
+            {
+                id: '136',
+                title: 'Ihdi jamihaanas Ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1jxWqLJ-lQFgUB-eltRLkhKQ6pvCgYG5p/view?usp=drive_link'
+            },
+
+            {
+                id: '137',
+                title: 'Ikhlass-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1TEIVKm0yQYBxUIIhaQ1haUk5TQaDwXlO/view?usp=drive_link'
+            },
+
+            {
+                id: '138',
+                title: 'Ila_khayrina',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1mbQni-vf-j-tli213GTV5AEetjZ6ngzw/view?usp=drive_link'
+            },
+
+            {
+                id: '139',
+                title: 'Ilal Mustafaa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1L6GR8lphii822D8fRwLei46l30Y-4b7I/view?usp=drive_link'
+            },
+
+            {
+                id: '140',
+                title: 'Ilayka Yaa RABBAL waraa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1UeIyp2fiM35KslcrJdRyMdtwZ5M71Tpk/view?usp=drive_link'
+            },
+
+            {
+                id: '141',
+                title: 'Ileyka Yaa - hadiyati',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1UNV8Kypqk-hhrmAHgb2XHSh0OqZ53AzY/view?usp=drive_link'
+            },
+
+            {
+                id: '142',
+                title: 'Ini oukhatiboul nasaaraa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1fi3Vndh9l8N3yqywLjBb3NfF_MMUXw2m/view?usp=drive_link'
+            },
+
+            {
+                id: '143',
+                title: 'Innanii Huztu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1DJP-QNNFtp6LEoWhpYAecvSOyCZyNvDH/view?usp=drive_link'
+            },
+
+            {
+                id: '144',
+                title: 'Inni aqulu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1ibWRQChICi-s6lN9k9tC2u18tMJDKvWm/view?usp=drive_link'
+            },
+
+            {
+                id: '145',
+                title: 'Iqra_Wa_raboukal_Akramou',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1aw8hFI4Q5BPc_IzYy2W32aIi4lWdBBnQ/view?usp=drive_link'
+            },
+
+            {
+                id: '146',
+                title: 'Irwaawun_naddym ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/18oiNq2wEx_YSySYpN8VhKU8s0XwXJCf9/view?usp=drive_link'
+            },
+
+            {
+                id: '147',
+                title: 'Jaalibatul_Maraaxib',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1a4VKQesdxTIpO1qTm-qT6EMupoKcSVpT/view?usp=drive_link'
+            },
+
+            {
+                id: '148',
+                title: 'jalibatul_burur',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1uDKE4PShXmeWYWRTOH4LSXfrIGKjyMkM/view?usp=drive_link'
+            },
+
+            {
+                id: '149',
+                title: 'jalibatul_massarah',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1kIWPx43PH3yDiiXXgWH_gpETBjEUIzmn/view?usp=drive_link'
+            },
+
+            {
+                id: '150',
+                title: 'janatul_hajilah',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1CkZj3kQEqddGabJpw2OU_bgVrabQ4Uk2/view?usp=drive_link'
+            },
+
+            {
+                id: '151',
+                title: 'Jawartu-En',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1U6rodNimdulCBAyi-BVUq8a2RYwTALQM/view?usp=drive_link'
+            },
+
+            {
+                id: '152',
+                title: 'Jazbatus-Sikhaar-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1je1NAneNelJwxUOdfkK3_LtZBpwFJUD5/view?usp=drive_link'
+            },
+
+            {
+                id: '153',
+                title: 'Karamu-ManKhalakha-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1-usvY8f1CvDYkJPKbzmPwUy1-DEMOeRf/view?usp=drive_link'
+            },
+
+            {
+                id: '154',
+                title: 'Kawine_liyal',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1UbyOu-HLRc3_fMb6VynpdkO0tTAgJRZW/view?usp=drive_link'
+            },
+
+            {
+                id: '155',
+                title: 'Kazu RAJAB',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1cPjICq4K5UqJg8IPKgc4gosxLPNkVpo2/view?usp=drive_link'
+            },
+
+            {
+                id: '156',
+                title: 'Khaatimatu Munaajaatii',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Wurf7UDTuO4SL9KYkTP3Uv-bTv6GRksz/view?usp=drive_link'
+            },
+
+            {
+                id: '157',
+                title: 'Khalo liyarkane',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Xynxp93jqUNsAJ1W5iYFHjMMHVr5B_dp/view?usp=drive_link'
+            },
+
+            {
+                id: '158',
+                title: 'Khamsatou Ridjal',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1bHdjC0dVJyoyNJixZFJNcpr1sCp-vV1P/view?usp=drive_link'
+            },
+
+            {
+                id: '159',
+                title: 'xd',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1bHdjC0dVJyoyNJixZFJNcpr1sCp-vV1P/view?usp=drive_link'
+            },
+
+            {
+                id: '160',
+                title: 'Khassida taani',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1XMdl1QWD21xnY9dntOtrb3Et7t5ex3Sk/view?usp=drive_link'
+            },
+
+            {
+                id: '161',
+                title: 'Khassida_Mawlidi_Nabii',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1wlzbGnIic9jdQaO_yqrIWMC__cHmxkYh/view?usp=drive_link'
+            },
+
+            {
+                id: '162',
+                title: 'Khassida_ramadane',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1raRK4SnTsl24a9DlshtYFZ2WADWigu3h/view?usp=drive_link'
+            },
+
+            {
+                id: '163',
+                title: 'Khatimatu-Munajati-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Upg7mj0kRj6JZts2GaSiFcXMyEaNjAT8/view?usp=drive_link'
+            },
+
+            {
+                id: '164',
+                title: 'Khatmoul_khur-ane',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1cLmESsO52MKFYLtnAKZ10VwZeMYziD1L/view?usp=drive_link'
+            },
+
+            {
+                id: '165',
+                title: 'Khoulnaa yaa naarou kunii',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1M_cfDfjL8CuEUS_40_Se5W0mVEQ04wOV/view?usp=drive_link'
+            },
+
+            {
+                id: '166',
+                title: 'Khoutbay Aldjuma yi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1COCrqnmFW41RPVK9nHEax84Ugk2XKixD/view?usp=drive_link'
+            },
+
+            {
+                id: '167',
+                title: 'Kufitu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1pdyOeANTBYSwQpFUGN9DY-8hi0rBf-Xt/view?usp=drive_link'
+            },
+
+            {
+                id: '168',
+                title: 'Kun Kaatiman',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/17p9ca8xbc2wOwXPuEcuQK-Bg1rlqN87P/view?usp=drive_link'
+            },
+
+            {
+                id: '169',
+                title: 'Kun-Kaatiman-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/14iFFUkLDmd22jNYi6GW_lCCdLCpLsbA8/view?usp=drive_link'
+            },
+
+            {
+                id: '170',
+                title: 'La ilaha ila anta subhaanaka inni kuntu mina-zaalimine',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1-8eKilIc3WdKknaONXd49qq_3DILMu8M/view?usp=drive_link'
+            },
+
+            {
+                id: '171',
+                title: 'La shaka xassida ',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1bRyFJkNPmT3YJJLP5e9ZFRsjzzm1EmzB/view?usp=drive_link'
+            },
+
+            {
+                id: '172',
+                title: 'Laa rayba fiixi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1v_XU_0R0Z7ZPa_o6TclwnCCHYYlr33oC/view?usp=drive_link'
+            },
+
+            {
+                id: '173',
+                title: 'Laa taxaf.',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/12H0lQwmXFwLBnc6ODXeT9cEBRuvOgUDP/view?usp=drive_link'
+            },
+
+            {
+                id: '174',
+                title: 'Laa yaatuuna',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1bY897E3l76YgK5UkMflFsVHouPr5fKiu/view?usp=drive_link'
+            },
+
+            {
+                id: '175',
+                title: 'Laa zamtu qabla yawmii',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1r8hopRxLNhW0ngysPTGtBgwaKKpExlGY/view?usp=drive_link'
+            },
+
+            {
+                id: '176',
+                title: 'Lahum daaru salaam',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1bd-dbg3oqb4vEDk-YZh5VTE3IQAXZm_N/view?usp=drive_link'
+            },
+
+            {
+                id: '177',
+                title: 'Lainchakartum-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1t2eR81P88rQb05P4xR-f5fMUTVxYNEFe/view?usp=drive_link'
+            },
+
+            {
+                id: '178',
+                title: 'Lam yabdu Mislul MUSTAFAA',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1H3Z-lUhMEvzflXriY3cQu-somrf809Re/view?usp=drive_link'
+            },
+
+            {
+                id: '179',
+                title: 'Lam-yabdou-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1gkGEiSIWvFt2ed5Jb7eHiHa0z2htyjm6/view?usp=drive_link'
+            },
+
+            {
+                id: '180',
+                title: 'Layantahi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1xMxI7mS-HBSnaW9u1jK0LSenDtUrhet9/view?usp=drive_link'
+            },
+
+            {
+                id: '181',
+                title: 'Laylatoul khadr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1GQ6U42NCJZ939b-rFGwzHgyEQoqwGI1L/view?usp=drive_link'
+            },
+
+            {
+                id: '182',
+                title: 'Laylatul qadr xayrun min alfi saxrin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1L6sLCKCUc1hynWtU7BPMwsnDo28HSwJp/view?usp=drive_link'
+            },
+
+            {
+                id: '183',
+                title: 'Laysal-birru-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1LDYV2X4SUUGAm4dbUPbXVkA91WRGYdTy/view?usp=drive_link'
+            },
+
+            {
+                id: '184',
+                title: 'Lil Moustapha',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1SCWgFBrvzIrIqWPeABTHxG2R5u81AFBI/view?usp=drive_link'
+            },
+
+            {
+                id: '185',
+                title: 'Lil Mustafa nawaytuma yujadidu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1PGsDCGHzQSBLfqFr2ipqgcjqnf_zEncr/view?usp=drive_link'
+            },
+
+            {
+                id: '186',
+                title: 'Lil-Lahi Rabil leuzi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1ByGeAFFwNjtCaBVOnR5XaTMIVZ4UmWcR/view?usp=drive_link'
+            },
+
+            {
+                id: '187',
+                title: 'LILLAAHI Saxru ramadaana',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1iI3MrxEOV2y8APvb7JPDNcAlsIJgafoH/view?usp=drive_link'
+            },
+
+            {
+                id: '188',
+                title: 'Lillahi kouli yati',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1g07BHzMxNTgOwMwbOB0as1SFvf7xgca5/view?usp=drive_link'
+            },
+
+            {
+                id: '189',
+                title: 'Limaahin Bachiirin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1xX219dnUQSBLi3v_2AFJFJO2AXVHBSJU/view?usp=drive_link'
+            },
+
+            {
+                id: '190',
+                title: 'Lirabbin Ghaforin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1hmZZY2Z4YOX3lTCIpaFZFAqD3KwsNX68/view?usp=drive_link'
+            },
+
+            {
+                id: '191',
+                title: 'Liyan khaada',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Ki0DV6r-_AYA6E8srKW6zVHQb_bn5A-S/view?usp=drive_link'
+            },
+
+            {
+                id: '192',
+                title: 'Mabdaaloul khira-aati',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1pRh6jGITSvcsRbmIbsGm1LsOPl-n_Hnl/view?usp=drive_link'
+            },
+
+            {
+                id: '193',
+                title: 'Madahtou',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1d7-mxlQJZSd-424v8lLW3LdPmLCTKCPK/view?usp=drive_link'
+            },
+
+            {
+                id: '194',
+                title: 'Madahtu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Hz4taBXkfWUARtn7r3gUwRwHCf-isPOG/view?usp=drive_link'
+            },
+
+            {
+                id: '195',
+                title: 'Madal Xabiru Lissanu Chukri',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1SvAJwqYA1ykcdpC7aIQr9Iwnt04SELaT/view?usp=drive_link'
+            },
+
+            {
+                id: '196',
+                title: 'Madaytu wa sarahtu shahbaana bisriya',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Uwld_KiK-tMG2LXiXnBADqDAk29D50jX/view?usp=drive_link'
+            },
+
+            {
+                id: '197',
+                title: 'Madhu Nabiyil Muntaqa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1SuE0RtHTQFtGykuhfRHdo7B9Ivqv6spA/view?usp=drive_link'
+            },
+
+            {
+                id: '198',
+                title: 'Massaatikul_Jinaan_fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1a_Zm87OT8VL8tZ180nty-NRm6-eifiqy/view?usp=drive_link'
+            },
+
+            {
+                id: '199',
+                title: 'Mafatihul_Bichri_ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1ClbW_SHj7ACJAWSgCsslW3BClf8vxYlQ/view?usp=drive_link'
+            },
+
+            {
+                id: '200',
+                title: 'Maghaliqu_niraan',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1UBbEjst_RskS7hsqaPcsrZidPHcq10Kh/view?usp=drive_link'
+            },
+
+            {
+                id: '201',
+                title: 'Maghaliun niiraan wa mafatikhoul jinaan_fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1JzubNH6SBg5csRbfGv8RK0UJWIASfUKh/view?usp=drive_link'
+            },
+
+            {
+                id: '202',
+                title: 'Maha huyobi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/10XbYtTHnQ8Mq6pVz3wA64_q18DJFAn3I/view?usp=drive_link'
+            },
+
+            {
+                id: '203',
+                title: 'Mahawta',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1i0St-0w5aYS8L-4vxc9iUFeaemR9j73T/view?usp=drive_link'
+            },
+
+            {
+                id: '204',
+                title: 'Majmahou Noreyni',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/188PbZLazpNEPCgVk9_iO9mx-gfdHLlDO/view?usp=drive_link'
+            },
+
+            {
+                id: '205',
+                title: 'Majmouatou Moubaraka',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1JNayEQOvKJq6Mfi6_xqwUMvElU5HFclp/view?usp=drive_link'
+            },
+
+            {
+                id: '206',
+                title: 'Wajaba Hamdou',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/13pG6Cy0sk4FAXmRT4UwoP3j3oRPCOjmc/view?usp=drive_link'
+            },
+
+            {
+                id: '207',
+                title: 'Makhal-Moustapha Hannile',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1mBfrX2F4bYsC9L6UfEpVrBsVXO27etZR/view?usp=drive_link'
+            },
+
+            {
+                id: '208',
+                title: 'Malaktou ahmada midaadi wakhilam',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1_3pePXV05lWILPcU7FoVOaNYx6CCONmA/view?usp=drive_link'
+            },
+
+            {
+                id: '209',
+                title: 'Man Jaa a Bil Hasanati',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1BCRBj0LlwlQJvXi35aGXV0zC11xC-JEH/view?usp=drive_link'
+            },
+
+            {
+                id: '210',
+                title: 'Manezanani',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1WAuJ7tcUiE11uU0lesA6yFuWBZtCej3w/view?usp=drive_link'
+            },
+
+            {
+                id: '211',
+                title: 'Maraamiya Indal LAAHI',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1vqkUveiPpDSc_Wt18h3YymdUAgIXp3w7/view?usp=drive_link'
+            },
+
+            {
+                id: '212',
+                title: 'Mashrabu_Saafi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/14pFUxT31zy6RD7trkBHOmvkBLJ6n7a_c/view?usp=drive_link'
+            },
+
+            {
+                id: '213',
+                title: 'Massalik',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1TOPnRBw6O7GfWO5lQPOhWz9eg3gnxb4k/view?usp=drive_link'
+            },
+
+            {
+                id: '214',
+                title: 'Matlaboul fawzayni-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/16Hd3h4vkyTvkV0nbgU2BCWab_-NVW67a/view?usp=drive_link'
+            },
+
+            {
+                id: '215',
+                title: 'matlabu_taqabul',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1qZ8u1uZ728oA2e6r2Zim0Ut51m37sDAp/view?usp=drive_link'
+            },
+
+            {
+                id: '216',
+                title: 'Matlabul Hafiyah',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1CNZ_ikYgLuHpEvFsVt5si8a5YKkb4dI3/view?usp=drive_link'
+            },
+
+            {
+                id: '217',
+                title: 'Matlabul Magharil Asna',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1zLtmXDCHsKpu4gAkHjg4zE2MlrTgw_CC/view?usp=drive_link'
+            },
+
+            {
+                id: '218',
+                title: 'Matlabul_Fawzeyni',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1IevQZdaXY1SdBrsBAonn3MAyZ1y9Wz7w/view?usp=drive_link'
+            },
+
+            {
+                id: '219',
+                title: 'Matlabus_Shifa-i_fr_',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1OFpkN6TBFCIvVjhcbOrKwyahuZH0rrU6/view?usp=drive_link'
+            },
+
+            {
+                id: '220',
+                title: 'Matlabush_Shifa-i',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/15yTl0SXGy89qXhKh03SVYczXLcYD7Z8g/view?usp=drive_link'
+            },
+
+            {
+                id: '221',
+                title: 'Mawahibal khadiimi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1LMAfcyCnctZq1eZUmcjH5dc9FpQgPkJP/view?usp=drive_link'
+            },
+
+            {
+                id: '222',
+                title: 'Mawahibu_nafih-ar-1',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1s8-KcoFD89SZf2DSEQifDenIrJfbWwo6/view?usp=drive_link'
+            },
+
+            {
+                id: '223',
+                title: 'Mawahibou nafih-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/15BeL6aKGbYwkIg75P0WteoPp9S-2gQ-Y/view?usp=drive_link'
+            },
+
+            {
+                id: '224',
+                title: 'Mawahibou_nafih_fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1ZdZ_Dx3fuFoM-hQCfB6rERgMqH6ITOse/view?usp=drive_link'
+            },
+
+            {
+                id: '225',
+                title: 'Mawahibou-r Rahmaane',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1RL2pSoHtv-ghE5rBn8wGmq7cmlhIMrOM/view?usp=drive_link'
+            },
+
+            {
+                id: '226',
+                title: 'Mawahiboul Xuduus-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1X-M0PRifR-yVighBQVdFOo3pzaHqwpiy/view?usp=drive_link'
+            },
+
+            {
+                id: '227',
+                title: 'Mawahiboul Xuduus-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/19uXSfKjQE4A_pY_acDouWVBwKo3z8v0x/view?usp=drive_link'
+            },
+
+            {
+                id: '228',
+                title: 'Midaadi_fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1fDkJpvUe3qpnSFvMo0SJHYFlRz3P-Ugf/view?usp=drive_link'
+            },
+
+            {
+                id: '229',
+                title: 'Miftahun_nasri_ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1SfdkA6JASrcxjz8zj7Qd1ll9Np0GYspn/view?usp=drive_link'
+            },
+
+            {
+                id: '230',
+                title: 'Miikaayil',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1M8C1uCDapBocW4OqF9Ptv8CzStX8YiuS/view?usp=drive_link'
+            },
+
+            {
+                id: '231',
+                title: 'Miim Raa Shiin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1uZMfmjNZxA5lrVIsdiTZpExy5uyoBbTQ/view?usp=drive_link'
+            },
+
+            {
+                id: '232',
+                title: 'Mimiya_ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1fIrZEXjT1ZFO2FJjxs378xm1FnVgyyDI/view?usp=drive_link'
+            },
+
+            {
+                id: '233',
+                title: 'Min Saxri ramadaana hanmi jamsasin..',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1W1O3q0CqZdXUuowX39a73Hiudj7nGlbY/view?usp=drive_link'
+            },
+
+            {
+                id: '234',
+                title: 'Min Shawwaali hanmi jamsasin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1FfzH4oLUl31eyEoxa6cl0qEFYS9ECuHf/view?usp=drive_link'
+            },
+
+            {
+                id: '235',
+                title: 'Minal lawhil Mahfuuzi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1XTZeTC5Q_mlQHVr8L70gJRJEQ_SK6Ix6/view?usp=drive_link'
+            },
+
+            {
+                id: '236',
+                title: 'Minal_ilahi_bi_rassouli',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1s4asTjU6y35J4bxPpswyjvRO5lW7k9Um/view?usp=drive_link'
+            },
+
+            {
+                id: '237',
+                title: 'Minal-Khadiimi ilal Mahdumi-miizaanu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1IivAM_EMu2koD69XI5aYv-w9Y1gj_Cqd/view?usp=drive_link'
+            },
+
+            {
+                id: '238',
+                title: 'Minal-Haqqi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Jzr06GlElsftZu5GYf0r3T595i2V7Xbc/view?usp=drive_link'
+            },
+
+            {
+                id: '239',
+                title: 'Minanul_Baaqil_Qadiim',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1JWWx3xy_dmyZl72BEEQ9ueUpRSBVQDE3/view?usp=drive_link'
+            },
+
+            {
+                id: '240',
+                title: 'Moukhadimatoul Amdah',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1dOPqcYcDM2xDBYDImvX3TrVQE0E98eno/view?usp=drive_link'
+            },
+
+            {
+                id: '241',
+                title: 'Mudda Xayaatii',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Dy5LGlaa9wPtEvqbZ4maJlXyTfq7-pCp/view?usp=drive_link'
+            },
+
+            {
+                id: '242',
+                title: 'Muhadimatul qidmah ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1WVYn1c3H8N1cweoei5pqlHG6TY3jALrc/view?usp=drive_link'
+            },
+
+            {
+                id: '243',
+                title: 'Muhamadun Rasul',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1lEl7Kdjq8bdHgcJNlwMtAE98cqGIF2XZ/view?usp=drive_link'
+            },
+
+            {
+                id: '244',
+                title: 'Muhammadikal Jamiil',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1nXMsDFbMKwyhRYMI9cF4j6tLQxy1Ru-9/view?usp=drive_link'
+            },
+
+            {
+                id: '245',
+                title: 'Mumittu kuffa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1upzTepbybgUhSi9B2VL9WkXZt9SOyvSN/view?usp=drive_link'
+            },
+
+            {
+                id: '245',
+                title: 'Muqadammatul_xidma Ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/19cdMbakz1xfh-KZhaq8yj3DrBBXJPpYX/view?usp=drive_link'
+            },
+
+            {
+                id: '246',
+                title: 'Nafahanii',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1U2DkAjwMoh4pdCEzeA5Chm5AU93YBYD_/view?usp=drive_link'
+            },
+
+            {
+                id: '247',
+                title: 'Nuru',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/13DNNkCq4thKpp92buSZPYkwji8CeUQyd/view?usp=drive_link'
+            },
+
+            {
+                id: '248',
+                title: 'Oubikhtou',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1zImMbRHXGqXgE5VuwwK0wTxeyNsxRzqQ/view?usp=drive_link'
+            },
+
+            {
+                id: '249',
+                title: 'Qasida-Taani-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/12B7R9WyxuFyTkAngI8CUmuQKsv5jqglW/view?usp=drive_link'
+            },
+
+            {
+                id: '250',
+                title: 'Ra-i-Ya',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1y3jkd8xLkw7twqGMYqbEX48cQQXoJD1Q/view?usp=drive_link'
+            },
+
+            {
+                id: '251',
+                title: 'Rabana taqabal minna',
+                author: 'Serigne Abdu Rahman Mbacke',
+                driveLink: 'https://drive.google.com/file/d/1ei0c6N0Q-E23Hl0Rlxzx6WcrNqAbcWWU/view?usp=drive_link'
+            },
+
+            {
+                id: '252',
+                title: 'Rabbi_Kariimine',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1E_hV16OFHBKjubVIfjCZ0jrL5fvq_jG8/view?usp=drive_link'
+            },
+
+            {
+                id: '253',
+                title: 'Rabbii bimaa yasrahu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1vncfqmRKsK5ZX4dwnhjZjMZ8AIdO_joB/view?usp=drive_link'
+            },
+
+            {
+                id: '254',
+                title: 'Rabiihul awwalu liya',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1oz0KVs58QZEUiQTcyXrJlkoFpBBSvuzn/view?usp=drive_link'
+            },
+
+            {
+                id: '255',
+                title: 'Rabiya-ahmadou',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1QUFcy_kBWeCot4b-8UPcw-F8Ob9ZtRQk/view?usp=drive_link'
+            },
+
+            {
+                id: '256',
+                title: 'Radiitu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1iRimWQQ4WKs2wLEkiKJowDNBWU0R9NYt/view?usp=drive_link'
+            },
+
+            {
+                id: '257',
+                title: 'Rafahnaa-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1GuJumM1pfDYoQ2quywqwGCErjNdBgeIl/view?usp=drive_link'
+            },
+
+            {
+                id: '258',
+                title: 'Rafakhna liyankhada-Ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1zcPBhg1n1aUkVQwNwP-w8dgbNKFBfMNV/view?usp=drive_link'
+            },
+
+            {
+                id: '259',
+                title: 'Rajab Saxrul Akrami',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/19mnFPh2qnALEETNajp2JEHMzzduvFoh7/view?usp=drive_link'
+            },
+
+            {
+                id: '260',
+                title: 'Rajab_rabistajib',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1dQncnIcLjtKHNVyIWbIqV0OHR2f49MpA/view?usp=drive_link'
+            },
+
+            {
+                id: '261',
+                title: 'Rajab',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/104WamoPSOvn9SAiVE0p6rb1d0tVY2AhU/view?usp=drive_link'
+            },
+
+            {
+                id: '262',
+                title: 'Ramadaanu Hanmi balsasin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1bmfp3MUZ4dcaqY4gSnhTwVIwfTzTvJz6/view?usp=drive_link'
+            },
+
+            {
+                id: '263',
+                title: 'Receuil_Khassaides-1',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1vPwaJGwUHkBqvlfPxOYuO4mTSSOCyqZY/view?usp=drive_link'
+            },
+
+            {
+                id: '264',
+                title: 'Receuil_Khassaides-2',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1YV-yTBYwNJnLHeYua-OCgMTfZzcKcr3i/view?usp=drive_link'
+            },
+
+            {
+                id: '265',
+                title: 'Recueil Sermons',
+                author: 'Serigne Saalihu MBACKE',
+                driveLink: 'https://drive.google.com/file/d/1xKjw6fF5wnNFae9t8sV0UjZpeN14HCXH/view?usp=drive_link'
+            },
+
+            {
+                id: '266',
+                title: 'Recueils Sermons',
+                author: 'Cheikh Moustapha MBACKE',
+                driveLink: 'https://drive.google.com/file/d/1-s8kR_7Fyfxh7IIP5g9zOt3r3jXI22VL/view?usp=drive_link'
+            },
+
+            {
+                id: '267',
+                title: 'Rumnaa_shukur',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1ppTirxzVydozxgWD9xLsUlF8xjEyL13u/view?usp=drive_link'
+            },
+
+            {
+                id: '268',
+                title: 'Jotaayu Texe P1',
+                author: 'Serigne Aladji MBACKE',
+                driveLink: 'https://drive.google.com/file/d/10VzKzhBnBJsBMNNbvrxmwOKbVhCCXE97/view?usp=drive_link'
+            },
+
+            {
+                id: '269',
+                title: 'Jotaayu Texe P1',
+                author: 'Serigne Aladji MBACKE',
+                driveLink: 'https://drive.google.com/file/d/1y5_K0e1atVQMNcfarokcKdS9paEMAImS/view?usp=drive_link'
+            },
+
+            {
+                id: '270',
+                title: 'Wakhi Serigne bi',
+                author: 'Serigne Aladji MBACKE',
+                driveLink: 'https://drive.google.com/file/d/1dmm6abO50VwDzRYf9BhvO6qU93g3PoTa/view?usp=drive_link'
+            },
+
+            {
+                id: '271',
+                title: 'Yoonou Mouride',
+                author: 'Serigne Aladji MBACKE',
+                driveLink: 'https://drive.google.com/file/d/1DE87Vpm1UP4A7MH91ruCVenvba5cnapk/view?usp=drive_link'
+            },
+
+            {
+                id: '272',
+                title: 'Yoonu Ga ngu baax gna',
+                author: 'Serigne Alaadji MBACKE',
+                driveLink: 'https://drive.google.com/file/d/1h7UfWO-IVHawv3mTdHYXmlRhhY7Jrn-S/view?usp=drive_link'
+            },
+
+            {
+                id: '273',
+                title: 'Yoonou jaam',
+                author: 'Serigne Alaadji MBACKE',
+                driveLink: 'https://drive.google.com/file/d/1w-rfu7vSM03eW4unQoNfo32RPFBA0taC/view?usp=drive_link'
+            },
+
+            {
+                id: '274',
+                title: 'ziyaara Serigne Touba',
+                author: 'Serigne Alaadji MBACKE',
+                driveLink: 'https://drive.google.com/file/d/1xSFk9SU-HG-dYJxLy4JcPB4jzwz3o195/view?usp=drive_link'
+            },
+
+            {
+                id: '275',
+                title: 'Miftahul_Huyob',
+                author: 'Serigne Alaadji MBACKE',
+                driveLink: 'https://drive.google.com/file/d/1spgMMdibUWXRSRXpeAmd79hdu_apq4bc/view?usp=drive_link'
+            },
+
+            {
+                id: '276',
+                title: 'Sabhun Taqii-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1poV_KWSTHsUbRtFz9PRQxvWjLqcXKD5E/view?usp=drive_link'
+            },
+
+            {
+                id: '277',
+                title: 'Sabhun Taqii-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/17yExITd7_fxLOWhU7n1wRATEw2oJgLrs/view?usp=drive_link'
+            },
+
+            {
+                id: '278',
+                title: 'Safaa ul qalbi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1dyhq-B7QyzB_nCkwCta3YN_7HNEn1rhM/view?usp=drive_link'
+            },
+
+            {
+                id: '279',
+                title: 'Safar_Saffaa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/19tjDUoSc0Z1Rfj13ttmISi2yQEKB-MVl/view?usp=drive_link'
+            },
+
+            {
+                id: '280',
+                title: 'Safar_salaatu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1un_v1RDG7TqTN7nVsRCX9mY8ISeGlrbM/view?usp=drive_link'
+            },
+
+            {
+                id: '281',
+                title: 'Safar Safar Safar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1snI5Li77cYezTEx4uG4vFz1eKHNhNDtA/view?usp=drive_link'
+            },
+
+            {
+                id: '282',
+                title: 'Safaru Bamsashine Junatun manuscrit S Abdu Rahman MBACKE',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1evt-jKUyi1wUH0KA0uieUSqVv6sb178R/view?usp=drive_link'
+            },
+
+            {
+                id: '283',
+                title: 'Safaru_Hamsachine',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/165BLF-YOHxstp0tU-WF1QNuqoXdUA5n2/view?usp=drive_link'
+            },
+
+            {
+                id: '284',
+                title: 'sahadatu_tulaab',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1pWYq_LGDrLrKbxJGn4_bOUa7E16umPf6/view?usp=drive_link'
+            },
+
+            {
+                id: '285',
+                title: 'Sahbaan-Shakartu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/16qDUSaVftCZhuJiXKhfGfuadEGmO6lKd/view?usp=drive_link'
+            },
+
+            {
+                id: '286',
+                title: 'Sahbaan',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1A7qf7Nw5qOAGR8pBeVMGGSbXi1D9ZirS/view?usp=drive_link'
+            },
+
+            {
+                id: '287',
+                title: 'Sakuuru Raafihu Wolof',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1a8ohanZTXbb2OEzfl_kvgKgUFsQ8q7tZ/view?usp=drive_link'
+            },
+
+            {
+                id: '288',
+                title: 'Sakuuru Raafihu Ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1tYqKLBzVRQw8K7Afh7X2ff1-r76tSbQj/view?usp=drive_link'
+            },
+
+            {
+                id: '289',
+                title: 'Salaatu Rahiimin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/10ffH7fgwosaIyR3MNnNfrZgCTAjdcRlZ/view?usp=drive_link'
+            },
+
+            {
+                id: '290',
+                title: 'Salaatul-Awliyaahi-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/10P0qlB_gFUur77-OYDzMWSz1pygGumHx/view?usp=drive_link'
+            },
+
+            {
+                id: '291',
+                title: 'Salahi bi fadlilla',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1yNDXmvpLFytr09a5XqKhxpG9ZEmrAdlH/view?usp=drive_link'
+            },
+
+            {
+                id: '292',
+                title: 'Salatun wa taslimun',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/15Vfhh_uUCJ82fBWX8qfbVY5egFvS_r5Q/view?usp=drive_link'
+            },
+
+            {
+                id: '293',
+                title: 'Sanuqrihuka-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1-2UFNDzcFrc_VQylXbGIn3tWqBkwD3AA/view?usp=drive_link'
+            },
+
+            {
+                id: '294',
+                title: 'Saxru Ramadaan',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1-Gh15Zzs6VjLvuMo-Ssyd5RZTZIeGK8Z/view?usp=drive_link'
+            },
+
+            {
+                id: '295',
+                title: 'Saxru ramadaana_sakartu rabbiya',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1HCeLZDJfJhGcRW5WQnO46rzQfkgLQyUb/view?usp=drive_link'
+            },
+
+            {
+                id: '296',
+                title: 'Shahbaanu bamsasin kuniya',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1tZJu3b63ufsXQ2wZihOdrgIqBSNejYDL/view?usp=drive_link'
+            },
+
+            {
+                id: '297',
+                title: 'Shahbaanu_Shaxidati',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1_0lfVlsNlJvPg002PEHlGcOiBPn3ikh4/view?usp=drive_link'
+            },
+
+            {
+                id: '298',
+                title: 'Shakawtu',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1d9E35UzEcX7qm5XyRdrJINh7TJnfeSkw/view?usp=drive_link'
+            },
+
+            {
+                id: '299',
+                title: 'Shifa-an min kuli da-in',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1zSol3grXSAvcOfo7dnYNe5IV0fw3v0f_/view?usp=drive_link'
+            },
+
+            {
+                id: '300',
+                title: 'Sifaatu Saadiqil Murid',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1j4iLEDziyRp_wQ6VqeEnz7lYnPguiBks/view?usp=drive_link'
+            },
+
+            {
+                id: '301',
+                title: 'Silkul-Jawahir-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1hq-MZvg48l6R_TbdmxTFeHpW-OtMWlNy/view?usp=drive_link'
+            },
+
+            {
+                id: '302',
+                title: 'Sullamul Firdawsi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1c97GSW65lzELuYcMXYy587Tq_xaYiKWx/view?usp=drive_link'
+            },
+
+            {
+                id: '303',
+                title: 'Sultaanun',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Q9Jet-4NccsjAtolMyF4BuAIdF_EGh-y/view?usp=drive_link'
+            },
+
+            {
+                id: '304',
+                title: 'Sulumul Fat-hi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1oVACdXA5dhYudvfWmiSyTI5h4jg4GCoL/view?usp=drive_link'
+            },
+
+            {
+                id: '305',
+                title: 'Suratul Kahf',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1wlM0B5fk9W5lulEAxI9Kqb4j0Fi3_Sec/view?usp=drive_link'
+            },
+
+            {
+                id: '306',
+                title: 'Taqriibul-Aqsaa-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1xShlxdz5wUO-9Ks6ObyDcB2VJCTLNzb4/view?usp=drive_link'
+            },
+
+            {
+                id: '307',
+                title: 'Tawbatun_nasuuh',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/139mB-APzy_ruky3qxKzGShfzH_viTXWB/view?usp=drive_link'
+            },
+
+            {
+                id: '308',
+                title: 'Taysiir',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1cBKZ0NI2pPJq4GmCCfn4T7451sifHN3N/view?usp=drive_link'
+            },
+
+            {
+                id: '309',
+                title: 'Taysirul Hafaar fi jawaabi habdil khaadiri',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1rQqqdrLAdoANiCr1s6JYyPx9ZPw31plo/view?usp=drive_link'
+            },
+
+            {
+                id: '310',
+                title: 'Taysirul_Assir',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1ScxkQ4VB0Afl2oL6xgHvH_kHVVT4AMY-/view?usp=drive_link'
+            },
+
+            {
+                id: '311',
+                title: 'Tuhfatul_awaa_Taxmiss',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/161LdM_hkWTHx216ZMOaB8Rbe-S-jddk2/view?usp=drive_link'
+            },
+
+            {
+                id: '312',
+                title: 'Wa alkhaytu halayka',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1svYBiLYOJewwG8gjiONCjp_gyYqJ5OVS/view?usp=drive_link'
+            },
+
+            {
+                id: '313',
+                title: 'Wa Ibaadu RAHMAANI',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1CCnqNVgs6qCkVPjVgol8trEvg8vI-e9T/view?usp=drive_link'
+            },
+
+            {
+                id: '314',
+                title: 'Wa innaka lahala',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1C5e_iMyfe5XdgE_RxCaKLf1EPqvRl8bn/view?usp=drive_link'
+            },
+
+            {
+                id: '315',
+                title: 'Wa Innaxoo lakitaabun hanziizun',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1YCVoQpcMb3BfFYfih0tJGNJqtjMyo4BW/view?usp=drive_link'
+            },
+
+            {
+                id: '316',
+                title: 'wa ufawwidu amriya ilal LAAHI',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1BZ--y-2q-OoIwkwj0ZvZL41RMp0wPNWs/view?usp=drive_link'
+            },
+
+            {
+                id: '316',
+                title: 'Wa wasaynaal Insaana bi waalidayxi husnan',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1yl8grZBbnOxGsrIem9_yzLy2qqSH-Mzi/view?usp=drive_link'
+            },
+
+            {
+                id: '317',
+                title: 'Wa Wassaynal Insaana',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Ibn2Fq2E53HdTG7lZZF1khIha27J43Xg/view?usp=drive_link'
+            },
+
+            {
+                id: '318',
+                title: 'Wa yakhlukhu maalaa tahlamouna',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Yu6yX_gASJkIeA4FmKGRV0oErA0yjRIz/view?usp=drive_link'
+            },
+
+            {
+                id: '319',
+                title: 'Wadieuhtou_lilahi_hamdane',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Rd-NCa7ok83ALmCYHlGw_QMy_IWNP1Kq/view?usp=drive_link'
+            },
+
+            {
+                id: '320',
+                title: 'Wadjahatnis',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1qVkWZ6Ds5-5wX9-ltE6aeGNcWaogGRcR/view?usp=drive_link'
+            },
+
+            {
+                id: '321',
+                title: 'Wadjahtou lil Haadi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/19jBU2zm8u22AZ71KIrzvc3YZRpT5mZZw/view?usp=drive_link'
+            },
+
+            {
+                id: '322',
+                title: 'Wadjahtou Lillahi Hamdane',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/13pK5BAn7la3XCgp3ftD9dY0R7ahajkuN/view?usp=drive_link'
+            },
+
+            {
+                id: '323',
+                title: 'Wajabahamdoul lahi wa salatou',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/11hbiTcOw6wc3yNfvBOktgYef6KXwLywe/view?usp=drive_link'
+            },
+
+            {
+                id: '324',
+                title: 'Wajabahamdourabbiyal hanziimi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/19LtlMnG5yzkGDAPxeM9Ww9s_qis2oep_/view?usp=drive_link'
+            },
+
+            {
+                id: '325',
+                title: 'Wajahtu abkara amdahi liman fudala',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1N3ruXi2bqbnpIR4Fs0oRLsZ1u8xc6qkp/view?usp=drive_link'
+            },
+
+            {
+                id: '326',
+                title: 'Wakaana_haqan_haleyna',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/14vuoTYtbV_Jb6Rz8cjA9CUpLTERDFHwD/view?usp=drive_link'
+            },
+
+            {
+                id: '327',
+                title: 'Walaqad_karamna',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1lMDl4Kr6SdCwJObow5TIymFN5CYql4_K/view?usp=drive_link'
+            },
+
+            {
+                id: '328',
+                title: 'Wallaahu yahsimuka minan naasi_Waqaanii',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/11Q_VB7QSxIDQk5gJxcpJ45NFhz9RZZkm/view?usp=drive_link'
+            },
+
+            {
+                id: '329',
+                title: 'Wasful Muriidi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1wibkoqs66ibM0X6TvCBEk2S1ab60WvsD/view?usp=drive_link'
+            },
+
+            {
+                id: '330',
+                title: 'wasilatu_rubohi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/10f97xT-yePoSGpI4568ZlIT9Q6pTh1Pj/view?usp=drive_link'
+            },
+
+            {
+                id: '331',
+                title: 'Wattaquul LAAHA',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1QSx3JxQ-NU8023HCeB1gsYd4rgPW97aw/view?usp=drive_link'
+            },
+
+            {
+                id: '332',
+                title: 'wazkuruu LAAHA fii Ayyaamin Mahduudaatin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1GEwyLfeqbqNLQr3BhSktZXR0A9QUjvwb/view?usp=drive_link'
+            },
+
+            {
+                id: '333',
+                title: 'Widaadi wa shoukri - Muraadiya qad kammalta',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1zxITFxK2q8Ekrhbpb4bQhzcaxJPdqFXF/view?usp=drive_link'
+            },
+
+            {
+                id: '334',
+                title: 'Wird Mahuz - Al Kaamil',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1PvS7H11GXxcW6yMAZ6usOag7Nloqgjia/view?usp=drive_link'
+            },
+
+            {
+                id: '335',
+                title: 'Wird Mahuz - Al khatam v3',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1u7URHVzG2RWMWpM1wchNtbx7-83qW2uE/view?usp=drive_link'
+            },
+
+            {
+                id: '336',
+                title: 'Woudohou',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1U_IwlFJ-RXgzBOc8V-dy3kaMkLv2AfZU/view?usp=drive_link'
+            },
+
+            {
+                id: '337',
+                title: 'Xaazal qawla',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1_ENxrOoHeon4JMts1Mra1tcyCu-zeYJX/view?usp=drive_link'
+            },
+
+            {
+                id: '338',
+                title: 'Xarnu-BI-wolof',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1wlatS__jlMOQI-Zj3F7gh9YHefzDXtxi/view?usp=drive_link'
+            },
+
+            {
+                id: '339',
+                title: 'Xasida Ataaba Lil mamarra',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1UuJIpw6J13pPVta7Q1iDkqQaDqD-X3ix/view?usp=drive_link'
+            },
+
+            {
+                id: '340',
+                title: 'Xasida KUN',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/19B2_p3j_ql8Sdj9kYu-JBj7KefB-t0ug/view?usp=drive_link'
+            },
+
+            {
+                id: '341',
+                title: 'Xasida_Yasurru',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1EsJGedu_N71L_v4gxMrTxu2Rt0zyQOrv/view?usp=drive_link'
+            },
+
+            {
+                id: '342',
+                title: 'Xassida Ayatul kursiyu ',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1qmtOLRQqOIcKWropn1wyelBpjSCZc1Mg/view?usp=drive_link'
+            },
+
+            {
+                id: '343',
+                title: 'Xassidatani',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1FmZfnai9fwSEWgg_wOPB83q-NKKXwQFa/view?usp=drive_link'
+            },
+
+            {
+                id: '344',
+                title: 'Xurratul_ayni',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1RMsIvI1qYcYDEt3yiZXCRxel12UFr3ea/view?usp=drive_link'
+            },
+
+            {
+                id: '345',
+                title: 'Ya Rabi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1hFdaGG_pG3Bhs1DRiBXcP0QgAM1VSoUE/view?usp=drive_link'
+            },
+
+            {
+                id: '346',
+                title: 'Yaa Joumlatane',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1j60UbXNrgLSH14ExRLLNE33UMVu6hxZ7/view?usp=drive_link'
+            },
+
+            {
+                id: '347',
+                title: 'Yaa kitaabal Kariimi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/11fNufMCEGc3YOt2dPgH8VpHsCmKKlb25/view?usp=drive_link'
+            },
+
+            {
+                id: '348',
+                title: 'Yaa man kafaanii',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1vA5wT4bCK4zDJl5crRO3aYtbQwsGqoxP/view?usp=drive_link'
+            },
+
+            {
+                id: '349',
+                title: 'Yaa Moukrimaa-Yaa Khayra',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Ye-5uSf6Ypk7MD2w0Noafm1XfH_cOpqb/view?usp=drive_link'
+            },
+
+            {
+                id: '350',
+                title: 'Yaa mukrimad dayfi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1MA5dbCTle8B8d20uIFT4zIZ8UXdqv_ZP/view?usp=drive_link'
+            },
+
+            {
+                id: '351',
+                title: 'Yaa rabbi bil Mustafaa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1VdWfdVQKKGpWwlfNIGcV3Z9tZb2iuC_f/view?usp=drive_link'
+            },
+
+            {
+                id: '352',
+                title: 'Yaa xayra dayfin',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/13sc4ABMVtZB43KAAcTknVC9ml67A9wBR/view?usp=drive_link'
+            },
+
+            {
+                id: '353',
+                title: 'Yaa Zal Hantaayaa',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1uarSniJ7wgGGs3DbV_rThqJI90wzGmtU/view?usp=drive_link'
+            },
+
+            {
+                id: '354',
+                title: 'Yaa zal wujuudi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1YTw83vqgf9zkgCQ_oXgCG5Shla6hhGuX/view?usp=drive_link'
+            },
+
+            {
+                id: '355',
+                title: 'yaa_zal_busharati',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/17E3Wa_lIBoJe_jTh-9uDPhIQ6yPLCX1y/view?usp=drive_link'
+            },
+
+            {
+                id: '356',
+                title: 'YaaKhayraDayfine-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1pkK9LxgmCasayFI2f_bgsoxcTszg1oYy/view?usp=drive_link'
+            },
+
+            {
+                id: '357',
+                title: 'Yakhini kitabul Lahi ',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Z31XyH8kzLnHGoH1tc6Y202dztDKUWnG/view?usp=drive_link'
+            },
+
+            {
+                id: '358',
+                title: 'Yaqiini',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/156slwzZimf1_Jo4mexXHY8KIo4DVrRxw/view?usp=drive_link'
+            },
+
+            {
+                id: '359',
+                title: 'Yaquulu hanbdul Laahi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1RK_63cUwKhnVxzAkg9xMdaQCtGzkIsGH/view?usp=drive_link'
+            },
+
+            {
+                id: '360',
+                title: 'Yarahmanou-Yarahimou',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1ntAa3dPxauz_hpX3A9zC_H5As34W7Yr6/view?usp=drive_link'
+            },
+
+            {
+                id: '361',
+                title: 'YassaraLil Akramou',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1ErtGrjCyK9EvtAf_dTjrdF6NkKt-1Grd/view?usp=drive_link'
+            },
+
+            {
+                id: '362',
+                title: 'Yawma Arbuhaan i rajab',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1K32O1KIbqDv1u-HrqC0S8qzD0W5ckgxo/view?usp=drive_link'
+            },
+
+            {
+                id: '363',
+                title: 'Yawma Hanshuraa a liya',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1LcukxBXJk8jVQ1uOMuJ3t0kNxI8YTu5-/view?usp=drive_link'
+            },
+
+            {
+                id: '363',
+                title: 'Yawma hanshuraa a yawmii',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1-s4tFjuCsZPqFsy6gfvXP9S6yyFq44Jr/view?usp=drive_link'
+            },
+
+            {
+                id: '364',
+                title: 'Yawmal Arbuhaan i',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/159M7MKzxEA1lKZIEMKesAzIqTl5xuvGw/view?usp=drive_link'
+            },
+
+            {
+                id: '365',
+                title: 'Yawmi nisfu shahbaanixii',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/11na258PpNatbKa8bXgFrG6ZyHlfipnlc/view?usp=drive_link'
+            },
+
+            {
+                id: '366',
+                title: 'Zalat',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1UQcomE2wbFQhXWdDblkM4yqQWFxilsJH/view?usp=drive_link'
+            },
+
+            {
+                id: '367',
+                title: 'Zul hijjati busharun',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1xBAgVV6kHtvIzH6c_kZXtvl0wMFf7q_3/view?usp=drive_link'
+            },
+
+            {
+                id: '368',
+                title: 'Zul hijjati',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1xlFyk9TXq2Dj_24nvA344vFYs5K83_m7/view?usp=drive_link'
+            }
+
+
+        ];
+
+        // Trie les vidéos par ordre alphabétique du titre
+        XASSIDAS.sort((a, b) => a.title.localeCompare(b.title, 'fr', {sensitivity: 'base'}));
+
+        const LIVRES = [
+            {
+                id: 'l1',
+                title: 'Alxuraan en Wolof', author: 'ALLAH (SWT)', driveLink:
+                    'https://drive.google.com/file/d/1V8S93byxBrqcwSBpo41emWUP3MNY78Da/view?usp=drive_link'
+            },
+            {
+                id: 'l2',
+                title: 'Cheikh Ibra Fall',
+                author: 'Sheikh Alassane Sène', driveLink:
+                    'https://drive.google.com/file/d/1DMmk5X6Gpyf8QiwP20bO5IBqrtDG8cBC/view?usp=drive_link'
+            },
+            {
+                id: 'l3',
+                title: 'Xuratul Ayni',
+                author: 'Serigne Chouhaybou MBACKE', driveLink:
+                    'https://drive.google.com/file/d/1E4Orppn8JrgdTAzS3FvTx9QUjkoEHrz6/view?usp=drive_link'
+            },
+            {
+                id: 'l4',
+                title: 'Wird Maaxuuz',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1OvKKR2YWqXs86k4NwSD7cPQ8vSL81Z2_/view?usp=drive_link'
+            },
+
+            {
+                id: 'l5',
+                title: 'Kàdduy Seriñ Mbay Jaxate (v2)',
+                author: 'Serigne Mbaye Diakhate',
+                driveLink: 'https://drive.google.com/file/d/1BFYghrqN4dx65RBFT9bF1Bc0LG_XjkMv/view?usp=drive_link'
+            },
+
+            {
+                id: 'l6',
+                title: 'Massalikul Jinaan',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1wj8e41e7VHQRLgS0F0Z67aN2SGhmOugs/view?usp=drive_link'
+            },
+
+            {
+                id: 'l7',
+                title: 'Juzz 01',
+                author: 'Serigne Samba Diagne',
+                driveLink: 'https://drive.google.com/file/d/180LvqEAYkNaLPIOj87yaNwd92v0B_D_z/view?usp=drive_link'
+            },
+
+            {
+                id: 'l8-u',
+                title: 'Irwaa-u-nadiim',
+                author: 'Sëriñ Muhammadu Lamin Jóob',
+                driveLink: 'https://drive.google.com/file/d/1Gn2VBV60DnWsN2BhHT0AzKTu1a7pzP4G/view?usp=drive_link'
+            },
+
+            {
+                id: 'l9',
+                title: 'Jahwarun Nafiis',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/17NE18JxqCOqkOp0if2RCnhZ8UswQ1mt_/view?usp=drive_link'
+            },
+
+            {
+                id: 'l10',
+                title: 'Jawaabu_Sokhna_Penda_DIOP',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/11cS7_eeMk8XSMMq9RhKsnZ3x-7MKCcN5/view?usp=drive_link'
+            },
+
+            {
+                id: 'l11',
+                title: 'Munawiru suduur-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Y5uV8PUF0ssfghgH-Zr4JnzWV5OsEVvf/view?usp=drive_link'
+            },
+
+            {
+                id: 'l12',
+                title: 'Munawiru suduur-en',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1OtlUNDnSuYETfMzbmVfAmtN7nVyRjwa3/view?usp=drive_link'
+            },
+
+            {
+                id: 'l13',
+                title: 'Nahju-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1AUzwgKFKNiFh3Td5JZB0l9n4jrSlhPRq/view?usp=drive_link'
+            },
+
+            {
+                id: 'l14',
+                title: 'Nahju-wolof',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1hXCKcZl383nhaYoNiFNtbzEKmcOJHlhj/view?usp=drive_link'
+            },
+
+            {
+                id: 'l15',
+                title: 'Ndaxam ab murid',
+                author: 'Serigne Mbaye Diakhate',
+                driveLink: 'https://drive.google.com/file/d/1hEhGPjy1_SIcxt_NK4XVj4snzKs-MkXG/view?usp=drive_link'
+            },
+
+            {
+                id: 'l16',
+                title: 'Niaan guy andak Wirdul Manhuuz',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1jFcP1UXzTMGS752ll7GJlTI0z8btWKfq/view?usp=drive_link'
+            },
+
+            {
+                id: 'l17',
+                title: 'Niaanu Serigne bi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Oh_4gaMBLSitgolxFl77Zuuv2_hkSz0V/view?usp=drive_link'
+            },
+
+            {
+                id: 'l18',
+                title: 'Niaanuk nisfu shahbaan',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1lSl29kIrETsNmpu2gHD2rAZHSldP4PbO/view?usp=drive_link'
+            },
+
+            {
+                id: 'l19',
+                title: 'Tanwiirus_suduur',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1VAVoVLRBz0_TwA0AJCeXWGnlm9Sg8A0k/view?usp=drive_link'
+            },
+
+            {
+                id: 'l20',
+                title: 'Tazawudu Shighar-ar',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/17lqN34U0pQ3Q31U-YrytWgxPIhhoRyMF/view?usp=drive_link'
+            },
+
+            {
+                id: 'l21',
+                title: 'Tazawudu Shighar-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1kHgcoJ2nSYSp-W4x-Q5bW0dCz1n_N_yG/view?usp=drive_link'
+            },
+
+            {
+                id: 'l22',
+                title: 'Tazawwudou-Shubban-fr',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1Gn_gjZhZ-OMM5cbtB6b6sovRwwVvlNvv/view?usp=drive_link'
+            },
+
+            {
+                id: 'l23',
+                title: 'Téere lénn ci ñaani att mi',
+                author: 'Cheikh Ahmadou Bamba',
+                driveLink: 'https://drive.google.com/file/d/1k6k4Skd9UqYthgGO__bEU5etPXN66x8t/view?usp=drive_link'
+            }
+
+        ];
+        //Trier les livres par ordres alphabetique
+        LIVRES.sort((a, b) => a.title.localeCompare(b.title, 'fr', {sensitivity: 'base'}));
+
+
+        const VIDEOS = [
+            {
+                id: 'v1',
+                title: 'Radiitou',
+                speaker: 'Koureel 1 Adolescent',
+                tag: 'Xassida',
+                link: 'https://youtu.be/R8jJ2IGIATU?si=u8mED8jh9z7l8zvq/preview'
+            },
+
+            {
+                id: 'v2',
+                title: 'Ra-i-ya Serigne Moustapha Diop',
+                speaker: 'Kourel 1 FMN Thies - Porokhane 2022',
+                tag: 'kourel',
+                link: 'https://youtu.be/rhctQKEQYJw?si=HX40KP3_08vr60_e/preview'
+            },
+
+            {
+                id: 'v3',
+                title: 'Ahbabtou - Jazbul Quloob',
+                speaker: 'Kourel FMN Thies',
+                tag: 'Conférence',
+                link: 'https://youtu.be/GhSprYAh84s?si=UdmYHKvV7A1xuNWF/preview'
+            },
+
+            {
+                id: 'v4',
+                title: 'Hudaa ilahi...',
+                speaker: 'Kourel 1 HT Nourou dareyni Touba',
+                tag: 'Conférence',
+                link: 'https://youtu.be/iUt3j3beMiQ?si=fXILPgYCMZk2LIIe/preview'
+            },
+
+            {
+                id: 'v5',
+                title: 'Jazbu Darou Moukhty',
+                speaker: 'Kourel 1 FMN Thies',
+                tag: 'Conférence',
+                link: 'https://youtu.be/vNqSvlJqqpw?si=ZIDRZY3ctPaAdxy6/preview'
+            },
+
+            {
+                id: 'v6',
+                title: 'Mawahibou Serigne Massamba',
+                speaker: 'Kourel 1 National',
+                tag: 'Conférence',
+                link: 'https://youtu.be/3JvHSQmnHag?si=qIRrkDKg4ePqp7Kc/preview'
+            },
+
+            {
+                id: 'v7',
+                title: 'Bismil Ila ikhfini',
+                speaker: 'Kourel Adolescent',
+                tag: 'Conférence',
+                link: 'https://youtu.be/jHWmss42p_Y?si=qrdG4GZLendLYGLF/preview'
+            },
+
+            {
+                id: 'v8',
+                title: 'Matlabul Fawzeyni',
+                speaker: 'Kourel 1 Treviso - Kazu Rajab 2025',
+                tag: 'Conférence',
+                link: 'https://youtu.be/VNw2Te69ACs?si=N48lLU-Uig6m0Mxh/preview'
+            },
+
+            {
+                id: 'v9',
+                title: 'Wakaana Haqqan',
+                speaker: 'Kourel 1 HT Touba',
+                tag: 'Conférence',
+                link: 'https://youtu.be/LE7W8T69yX4?si=d9TFqASoacMoPUXX/preview'
+            },
+
+            {
+                id: 'v10',
+                title: 'MadalKhabirou',
+                speaker: 'Kourel Tout Tank HTDKH',
+                tag: 'Conférence',
+                link: 'https://youtu.be/W-hiLFeJad4?si=OieGJySNTLeFlxsf/preview'
+            },
+
+            {
+                id: 'v11',
+                title: 'Wajaba Hamdu',
+                speaker: 'Kourel Nuuru Darayni HT Thies',
+                tag: 'Conférence',
+                link: 'https://youtu.be/bLTjOorzorM?si=LfOnB2vM2K93fjS_/preview'
+            },
+
+            {
+                id: 'v12',
+                title: 'Hamdii Washukri',
+                speaker: 'Kourel 1 Mafatikhoul Bichri Touba',
+                tag: 'Conférence',
+                link: 'https://youtu.be/9SZ5JVsFMks?si=s2janehPTSnBJ501/preview'
+            },
+
+            {
+                id: 'v13',
+                title: 'Mada Zikroullah',
+                speaker: 'Modou Ndella FAll',
+                tag: 'Conférence',
+                link: 'https://youtu.be/8VCsthCTsDQ?si=Hnoi8COQ27J7HkFF/preview'
+            },
+
+            {
+                id: 'v14',
+                title: 'Jazbul Quloob',
+                speaker: 'Kourel Nuurud Dareyni HT Thies',
+                tag: 'Conférence',
+                link: 'https://youtu.be/iUt3j3beMiQ?si=fXILPgYCMZk2LIIe/preview'
+            },
+
+            {
+                id: 'v15',
+                title: 'Tahmiss Serigne Moustapha Diop',
+                speaker: 'Kourel Tout Tank Cellule HTDKH',
+                tag: 'Conférence',
+                link: 'https://youtu.be/jDHpTmrEZvw?si=AMC-lhCPZ_Wl-lcA/preview'
+            },
+
+            {
+                id: 'v16',
+                title: 'Mawahibou 78 - Serigne Massamba',
+                speaker: 'Kourel National Italie',
+                tag: 'Conférence',
+                link: 'https://youtu.be/wiDERmXlD74?si=753BMwg5fSQ-UzUJ/preview'
+            },
+
+            {
+                id: 'v17',
+                title: 'Mawahibou WKSM',
+                speaker: 'Kourel FMN Thies',
+                tag: 'Conférence',
+                link: 'https://youtu.be/EV2Wxz6_yes?si=piHZ1lDsRWNpbT0f/preview'
+            },
+
+            {
+                id: 'v18',
+                title: 'Midadi - Porokhane 2023',
+                speaker: 'Kourel HT Dakar',
+                tag: 'Conférence',
+                link: 'https://youtu.be/HKQeeMbiGkY?si=IxKRfMRZ3zHf5voo/preview'
+            },
+
+            {
+                id: 'v19',
+                title: 'Midadi',
+                speaker: 'Kourel 1 Akhlou Minan Diourbel',
+                tag: 'Conférence',
+                link: 'https://youtu.be/yXv1xlj12K4?si=N5HTEcHvTZn832bI/preview'
+            },
+
+            {
+                id: 'v20',
+                title: 'Midadi Nawaytou',
+                speaker: 'Kourel 1 National',
+                tag: 'Conférence',
+                link: 'https://youtu.be/DnJDXt56BXc?si=ErZPDeixnZZxcRcL/preview'
+            },
+
+            {
+                id: 'v21',
+                title: 'Midadi',
+                speaker: 'Kourel HT Rufisque - Ramadan 2021',
+                tag: 'Conférence',
+                link: 'https://youtu.be/XDP_Jan00u8?si=xNZhMAt8jHhyAX7b/preview'
+            },
+
+            {
+                id: 'v22',
+                title: 'Midadi',
+                speaker: 'Kourel 1 HT Rufisque',
+                tag: 'Conférence',
+                link: 'https://youtu.be/01-GduDwwqA?si=XkPocsC6lofyqscN/preview'
+            },
+
+            {
+                id: 'v23',
+                title: 'Madahtou - Midadi',
+                speaker: 'Kourel Treviso Italie',
+                tag: 'Conférence',
+                link: 'https://youtu.be/4NtETmk9Qvc?si=VFfsuoKLEhKJUaYY/preview'
+            },
+
+            {
+                id: 'v24',
+                title: 'Midadi Nawaytou - Micro Serigne Lamine Seye',
+                speaker: 'Kourel MN Thies',
+                tag: 'Conférence',
+                link: 'https://youtu.be/iUt3j3beMiQ?si=fXILPgYCMZk2LIIe/preview'
+            },
+
+            {
+                id: 'v25',
+                title: 'Saana Ilaahi',
+                speaker: 'Kourel 3 Saalihina - Micro Mame Mor Dione',
+                tag: 'Xassida',
+                link: 'https://youtu.be/0kDcjPqg2M8?si=_qVK56Wk81hKmGLl/preview'
+            },
+
+            {
+                id: 'v26',
+                title: 'Mafatikhoul Jinaan Darou Moukhty',
+                speaker: '',
+                tag: 'Xassida',
+                link: 'https://youtu.be/TO6wocydR1k?si=i333taufx5ExKeNT/preview'
+            },
+
+            {
+                id: 'v27',
+                title: 'Mafatikhoul Jinaan Darou Moukhty',
+                speaker: 'Kourel WKSM HT',
+                tag: 'Xassida',
+                link: 'https://youtu.be/6TuPuWAXXEM?si=xp4C8I_HKsUH34Wp/preview'
+            },
+
+            {
+                id: 'v28',
+                title: 'Mafatikhoul Jinaan - Radjass',
+                speaker: 'Serigne Bolle Mbaye',
+                tag: 'Xassida',
+                link: 'https://youtu.be/JOV5vli0Uhk?si=kxgRnJ3PBII7lsD5/preview'
+            },
+
+            {
+                id: '29',
+                title: 'Ajaabani - Yaaman - Zalat - Wajahtu',
+                speaker: 'Selection',
+                tag: 'Xassida',
+                link: 'https://youtu.be/HqNZFvwWGxI?si=IpHcyEfPVIx9fH-1/preview'
+            },
+
+            {
+                id: 'v30',
+                title: 'Ajabani Raboussama',
+                speaker: 'Kourel 1 HT Thies',
+                tag: 'Xassida',
+                link: 'https://youtu.be/Z9Rz6OxKpLw?si=jl9D4U6ZXQjXokB4/preview'
+            },
+
+            {
+                id: 'v31',
+                title: 'Midadi - Micro Ousseynou Fall',
+                speaker: 'Kourel Treviso Italie',
+                tag: 'Xassida',
+                link: '/preview'
+            },
+
+            {
+                id: 'v32',
+                title: 'Ajabani Xayruba',
+                speaker: 'Serigne CISSE',
+                tag: 'Xassida',
+                link: 'https://youtu.be/8nMAvc1gLEA?si=HdX95BNFSCaKOT54/preview'
+            },
+
+            {
+                id: 'v33',
+                title: 'Adjabani Raboussama WKSM',
+                speaker: 'HT Ramadan 2025',
+                tag: 'Xassida',
+                link: 'https://youtu.be/Of6jpsSK1pU?si=5C0zuXSuqHWs0V9R/preview'
+            },
+
+            {
+                id: 'v34',
+                title: 'Extrait Xassida',
+                speaker: 'Noce',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1oKK8cxl67HHQ13WjiN7GlJzwf4v7iECR/view?usp=drive_link'
+            },
+
+            {
+                id: 'v35',
+                title: 'Extrait Xassida',
+                speaker: 'Noce',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1ybsWd-eKjsyV1NnwtWKMvrpo6Rd7-Im0/view?usp=drive_link'
+            },
+
+            {
+                id: 'v36',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1BGlSuUU02EJUJN6OL3Q_Dx5mZpi_WXCh/view?usp=drive_link'
+            },
+
+            {
+                id: 'v37',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1DC9fiIyQs-8AgR93m0Fy9TJEqcpZAH4o/view?usp=drive_link'
+            },
+
+            {
+                id: 'v38',
+                title: 'Waxaani',
+                speaker: 'Kourel Salihi',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1k7h_p9wJXCBWfBZCHGeQKXUThtUFjh58/view?usp=drive_link'
+            },
+
+            {
+                id: 'v39',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1_cYWZDt6pGOvZnr2WkyX2Ty_G6Z2u-Ug/view?usp=drive_link'
+            },
+
+            {
+                id: 'v40',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1yVGSvxeSzeQLhzO1MR6ofU4qr2k2a5S3/view?usp=drive_link'
+            },
+
+            {
+                id: 'v41',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1TVlhstqapzQlD_aLwdtURBOAKsjMXZZE/view?usp=drive_link'
+            },
+
+            {
+                id: 'v42',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1_HLZX9a_kri7LMlGTrUkg-sLAk_XLyTD/view?usp=drive_link'
+            },
+
+            {
+                id: 'v43',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1nRn7dVXDXgja25wU0Od5FBX9Y1ARx2Oe/view?usp=drive_link'
+            },
+
+            {
+                id: 'v44',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/17vgW-m1OIwMknaSh-dFVua4pKComonel/view?usp=drive_link'
+            },
+
+            {
+                id: 'v45',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1AS9cq_r7RDuEEotc66M1S9AEYu2o5aD_/view?usp=drive_link'
+            },
+
+            {
+                id: 'v46',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1-z10K3CBQv1493dkFpY98pTiG18gx1aq/view?usp=drive_link'
+            },
+
+            {
+                id: 'v47',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1w0JIe9bxiEdGeSCdbGHk5rhDtNQlDVJ6/view?usp=drive_link'
+            },
+
+            {
+                id: 'v48',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1TMSu_vFFPzPbRwwEFVPryTm7CMFCxrUE/view?usp=drive_link'
+            },
+
+            {
+                id: 'v49',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/16dKyhUvubVdlLGwYUJrY7kWcCxENIJXU/view?usp=drive_link'
+            },
+
+            {
+                id: 'v50',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/16dKyhUvubVdlLGwYUJrY7kWcCxENIJXU/view?usp=drive_link'
+            },
+
+            {
+                id: 'v51',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1xpHl2gQgBGlt1geEpAyPjraHkPaCbmXm/view?usp=drive_link'
+            },
+
+
+            {
+                id: 'v52',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1qLkikxzQCnH7Hoy3cPpPqv59qZFMn1EK/view?usp=drive_link'
+            },
+
+
+            {
+                id: 'v53',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: 'https://drive.google.com/file/d/1b1RwIGGwJL2Hry-LjtteXF0fQkrcSnXj/view?usp=drive_link'
+            },
+
+
+            {
+                id: 'v54',
+                title: 'Short',
+                speaker: 'Xassida',
+                tag: 'Xassida',
+                link: ''
+            },
+
+            {
+                id: 'v55',
+                title: 'Waxtaan ci Xassida Nuuru Daarayni',
+                speaker: 'Serigne Ahmadou MBACKE',
+                tag: 'Xassida',
+                link: 'https://youtu.be/g7e3HHtQlJs?si=zujlnvtk9ft9XNdv/preview'
+            },
+
+            {
+                id: 'v55',
+                title: 'La patience',
+                speaker: 'Serigne Bassirou Khelcom',
+                tag: 'Xassida',
+                link: 'https://youtu.be/wwRu0s_AllI?si=90Lpychsrt2wjU3M/preview'
+            },
+
+            {
+                id: 'v57',
+                title: 'La confiance en soi',
+                speaker: 'Serigne Bassirou Khelcom',
+                tag: 'Xassida',
+                link: 'https://youtu.be/bV39SOTqumU?si=NeZIfDZcTS-GxGzN/preview'
+            },
+
+            {
+                id: 'v58',
+                title: 'Sérénité et clés de la réussite dans la vie',
+                speaker: 'Serigne Bassirou Khelcom',
+                tag: 'Xassida',
+                link: 'https://youtu.be/fEALWBy1mBQ?si=fwhQKloPE7oCPRNU/preview'
+            },
+
+            {
+                id: 'v59',
+                title: "Les Manieres d'ajir",
+                speaker: 'Serigne Bassirou Khelcom',
+                tag: 'Xassida',
+                link: 'https://youtu.be/EXPs-g0EVvo?si=KcubdRMMd1-0pSq9/preview'
+            },
+
+            {
+                id: 'v60',
+                title: 'Tarbiyah ak Xassida',
+                speaker: 'Serigne Bassirou Khelcom',
+                tag: 'Xassida',
+                link: 'https://youtu.be/myyv9nwhQ9o?si=rNgd4xUfsQ6cZ40y/preview'
+            },
+
+            {
+                id: 'v61',
+                title: 'Sante Yalla',
+                speaker: 'Serigne Bassirou Khelcom',
+                tag: 'Xassida',
+                link: 'https://youtu.be/mrQ7bBh1_DA?si=c9hxTiu9OcZuNQKS/preview'
+            },
+
+            {
+                id: 'v62',
+                title: 'Les comportements recommandés par Serigne Touba',
+                speaker: 'Serigne Bassirou Khelcom',
+                tag: 'Xassida',
+                link: 'https://youtu.be/_AbPVhl--Fw?si=mo5F3rxnnufAV-ny/preview'
+            },
+
+            {
+                id: 'v63',
+                title: 'Histoire Seydina Mouhamad (PSL)',
+                speaker: 'Serigne Bassirou Khelcom',
+                tag: 'Xassida',
+                link: 'https://youtu.be/aGA7JUKYwog?si=5R4MNGxa8Jbb29AX/preview'
+            },
+
+            {
+                id: 'v64',
+                title: 'La pensée positive - Xel mu Sel',
+                speaker: 'Serigne Bassirou Khelcom',
+                tag: 'Xassida',
+                link: 'https://youtu.be/lkPPIBWKNp0?si=a9aNl1pKNlBIvMTi/preview'
+            },
+
+            {
+                id: 'v65',
+                title: 'La confiance en soi',
+                speaker: 'Serigne Bassirou Khelcom',
+                tag: 'Xassida',
+                link: 'https://youtu.be/vzzcfMWCtJI?si=kCCIYQXE3ySBL9yj/preview'
+            },
+
+            {
+                id: 'v66',
+                title: 'Tawhiid',
+                speaker: 'Serigne Bassirou Khelcom',
+                tag: 'Xassida',
+                link: 'https://youtu.be/OIXUy7g46e4?si=bg6ug-u2LmSb3BRc/preview'
+            },
+
+            {
+                id: 'v67',
+                title: 'Cheikh Ahmadou Bamba',
+                speaker: 'Serigne Bassirou Khelcom',
+                tag: 'Xassida',
+                link: 'https://youtu.be/zm_cvApH7Jw?si=1halYGFWoKVknm8n/preview'
+            },
+
+            {
+                id: 'v68',
+                title: 'Tuub bakaar - pouvoir du repentir',
+                speaker: 'Serigne Bassirou Khelcom',
+                tag: 'Xassida',
+                link: 'https://youtu.be/dgyL9l9S6ao?si=yWijweTakr6fkljK/preview'
+            },
+
+            {
+                id: 'v69',
+                title: 'Yitté',
+                speaker: 'Serigne Bassirou Khelcom',
+                tag: 'Xassida',
+                link: 'https://youtu.be/7OHJWFylPRY?si=ohz3TSrNgYnsGqMe/preview'
+            },
+
+
+            {
+                id: 'v70',
+                title: 'Kourel Selection HT',
+                speaker: 'Noce',
+                tag: 'Xassida',
+                link: 'https://youtube.com/shorts/aIKAHaDS9Kc?si=8WWJ-PkFcghLwr5f/preview'
+            },
+
+
+            {
+                id: 'v71',
+                title: 'Tahmiss Serigne Tafsir DIOP',
+                speaker: 'Kourel Adolescent',
+                tag: 'Xassida',
+                link: 'https://youtube.com/shorts/_a4X3J5-szk?si=uq2xCnjods2EY3Ss/preview'
+            },
+
+
+            {
+                id: 'v72',
+                title: 'Yassuru',
+                speaker: 'Kourel HT Thies',
+                tag: 'Xassida',
+                link: 'https://youtu.be/l86zdOR0rbE?si=qo-FFVHpFJKQAuH4/preview'
+            },
+
+            {
+                id: 'v73',
+                title: 'Saani ilaahi',
+                speaker: 'Kourel 3 Salihina',
+                tag: 'Xassida',
+                link: 'https://youtu.be/0kDcjPqg2M8?si=81PhV3CdAFlvyyQW/preview'
+            }
+
+        ];
+
+        const app = {
+            state: {page: 'home', search: '', itemsPerPage: 12, pagination: {xassidas: 1, livres: 1, videos: 1}},
+
+            init() {
+                // Splash Logic
+                setTimeout(() => document.getElementById('splashScreen').classList.add('fade-out'), 1800);
+
+                // Event Listeners
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    this.state.search = e.target.value.toLowerCase();
+                    if (this.state.page === 'home' && this.state.search.length > 0) this.router('xassidas');
+                    else if (this.state.page !== 'home') this.renderPage(this.state.page);
+                });
+
+                // Scroll Header Background
+                window.addEventListener('scroll', () => {
+                    const header = document.querySelector('.glass-panel');
+                    if (window.scrollY > 50) header.classList.add('bg-midnight-950/80');
+                    else header.classList.remove('bg-midnight-950/80');
+                });
+
+                // Pagination
+                document.getElementById('btnPrev').onclick = () => this.changePage(-1);
+                document.getElementById('btnNext').onclick = () => this.changePage(1);
+
+                // Sort Data
+                [XASSIDAS, LIVRES, VIDEOS].forEach(arr => arr.sort((a, b) => a.title.localeCompare(b.title)));
+            },
+
+            router(target) {
+                this.state.page = target;
+
+                // Update Nav UI
+                document.querySelectorAll('.nav-item').forEach(el => {
+                    if (el.dataset.target === target) {
+                        el.classList.add('bg-white', 'text-midnight-950', 'shadow-lg');
+                        el.classList.remove('text-slate-400', 'hover:text-white');
+                    } else {
+                        el.classList.remove('bg-white', 'text-midnight-950', 'shadow-lg');
+                        el.classList.add('text-slate-400', 'hover:text-white');
+                    }
+                });
+
+                // Mobile Nav UI
+                document.querySelectorAll('.nav-mobile').forEach(el => {
+                    if (el.dataset.target === target) el.classList.add('text-gold-400');
+                    else el.classList.remove('text-gold-400');
+                });
+
+                const home = document.getElementById('page-home');
+                const content = document.getElementById('page-content');
+                const searchInput = document.getElementById('searchInput');
+
+                if (target === 'home') {
+                    home.classList.remove('hidden');
+                    content.classList.add('hidden');
+                    searchInput.value = '';
+                    this.state.search = '';
+                } else {
+                    home.classList.add('hidden');
+                    content.classList.remove('hidden');
+                    this.renderPage(target);
+                }
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            },
+
+            getData(type) {
+                let data = type === 'xassidas' ? XASSIDAS : type === 'livres' ? LIVRES : VIDEOS;
+                if (this.state.search) {
+                    return data.filter(i => (i.title + i.author + i.speaker).toLowerCase().includes(this.state.search));
+                }
+                return data;
+            },
+
+            renderPage(type) {
+                const config = {
+                    'xassidas': {t: 'Xassidas', s: 'Textes Sacrés'},
+                    'livres': {t: 'Bibliothèque', s: 'Ouvrages de référence'},
+                    'videos': {t: 'Vidéothèque', s: 'Conférences & Zikrs'}
+                };
+
+                document.getElementById('sectionTitle').innerText = config[type].t;
+                document.getElementById('sectionSubtitle').innerText = config[type].s;
+
+                const data = this.getData(type);
+                const pageIndex = this.state.pagination[type];
+                const start = (pageIndex - 1) * this.state.itemsPerPage;
+                const pageData = data.slice(start, start + this.state.itemsPerPage);
+
+                document.getElementById('itemCount').innerText = `${data.length} résultats`;
+                document.getElementById('pageIndicator').innerText = `${pageIndex} / ${Math.ceil(data.length / this.state.itemsPerPage) || 1}`;
+
+                document.getElementById('btnPrev').disabled = pageIndex === 1;
+                document.getElementById('btnNext').disabled = (start + this.state.itemsPerPage) >= data.length;
+
+                const grid = document.getElementById('contentGrid');
+                grid.innerHTML = '';
+
+                if (pageData.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full py-20 text-center text-slate-500 font-light">Aucun document trouvé.</div>`;
+                    return;
+                }
+
+                pageData.forEach(item => {
+                    const initials = (item.title || 'Xc').substring(0, 2).toUpperCase();
+                    let thumb = '';
+
+                    if (type === 'videos') {
+                        const vidId = item.link.match(/(?:v=|\/embed\/|youtu\.be\/)([^"&?\/\s]+)/)?.[1];
+                        if (vidId) thumb = `<img src="https://img.youtube.com/vi/${vidId}/mqdefault.jpg" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700">`;
+                    } else {
+                        thumb = `<span class="text-3xl font-serif text-white/20 group-hover:text-gold-400 transition-colors">${initials}</span>`;
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = "glass-card p-4 rounded-xl group hover:border-gold-500/20 transition-all duration-300 flex flex-col h-full";
+                    card.innerHTML = `
+                        <div class="h-40 mb-4 rounded-lg bg-midnight-800 border border-white/5 overflow-hidden relative flex items-center justify-center">
+                            ${thumb}
+                            ${type === 'videos' ? '<div class="absolute inset-0 flex items-center justify-center"><div class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform"><svg class="w-4 h-4 text-white fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>' : ''}
+                        </div>
+                        <h4 class="font-medium text-slate-200 line-clamp-2 mb-1 group-hover:text-gold-200 transition-colors">${item.title}</h4>
+                        <p class="text-xs text-slate-500 mb-4 line-clamp-1">${item.author || item.speaker || ''}</p>
+                        <div class="mt-auto flex gap-2">
+                             <button onclick="app.openItem('${type}', '${item.id}')" class="flex-1 py-2 rounded-lg bg-white/5 hover:bg-gold-500 hover:text-white text-xs font-medium text-slate-300 transition-all uppercase tracking-wide">
+                                ${type === 'videos' ? 'Visionner' : 'Lire'}
+                            </button>
+                            <button onclick="app.downloadItem('${type}', '${item.id}')" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            },
+
+            changePage(dir) {
+                if (this.state.page === 'home') return;
+                this.state.pagination[this.state.page] += dir;
+                this.renderPage(this.state.page);
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            },
+
+            // Modal & Helpers
+            getItem(type, id) {return this.getData(type).find(i => i.id === id);},
+
+            openItem(type, id) {
+                const item = this.getItem(type, id);
+                if (!item) return;
+
+                document.getElementById('modalTitle').innerText = item.title;
+                document.getElementById('modalSubtitle').innerText = item.author || item.speaker || type;
+                document.getElementById('modalDownloadBtn').onclick = () => this.downloadItem(type, id);
+
+                let url = type === 'videos' ? item.link : item.driveLink;
+                let src = '';
+
+                // Smart Preview Logic
+                if (url.includes('drive.google.com')) {
+                    const id = url.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1];
+                    if (id) src = `https://drive.google.com/file/d/${id}/preview`;
+                } else if (url.includes('youtu')) {
+                    const id = url.match(/(?:v=|\/embed\/|youtu\.be\/)([^"&?\/\s]+)/)?.[1];
+                    if (id) src = `https://www.youtube.com/embed/${id}?autoplay=1`;
+                } else {
+                    src = url;
+                }
+
+                document.getElementById('modalFrame').src = src;
+                const modal = document.getElementById('universalModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+            },
+
+            closeModal() {
+                const modal = document.getElementById('universalModal');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.getElementById('modalFrame').src = '';
+                document.body.style.overflow = '';
+            },
+
+            downloadItem(type, id) {
+                const item = this.getItem(type, id);
+                let url = type === 'videos' ? item.link : item.driveLink;
+                if (!url) return this.toast("Lien introuvable");
+
+                let dlLink = url;
+                if (url.includes('drive.google.com')) {
+                    const id = url.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1];
+                    if (id) dlLink = `https://drive.google.com/uc?export=download&id=${id}`;
+                }
+                window.open(dlLink, '_blank');
+                this.toast("Téléchargement...");
+            },
+
+            toast(msg) {
+                const t = document.getElementById('toast');
+                document.getElementById('toastMsg').innerText = msg;
+                t.classList.remove('opacity-0', '-translate-y-20');
+                setTimeout(() => t.classList.add('opacity-0', '-translate-y-20'), 3000);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => app.init());
+    </script>
+</body>
+
+</html>
